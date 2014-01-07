@@ -1,0 +1,272 @@
+<html lang="en" ng-app="myApp" xmlns="http://www.w3.org/1999/html" style="overflow: hidden;height: 590px">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>myWeibo</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/myweibo.css"/>
+    <style>
+        .warp1{width:600px;margin:0 auto;}
+        .head{height: 50px;}
+    </style>
+</head>
+<body  style="overflow:hidden;background-image: url(/img/content_inner_bg.png);height: 590px;
+    text-shadow: 0 1px 0 #FFFFFF;background: rgba(248,248,248,1);font-family: '微软雅黑'" >
+<div id = "a1" ng-controller="weiboCtrl"  style="z-index: 0;overflow: hidden;height:100%;">
+    <div id="tab-content" class="tab-content" style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
+        <div id = "a2" class="tab-pane active" id="home" style="overflow: hidden">
+            <div style="width: 600px;padding-left: 10px;position: relative;overflow: hidden" >
+                <div id="header" class="shadow"  style="background-color: rgba(248,248,248,1);width: 100%;margin-left: -10px;margin-right: 5px; height: 58px;z-index: 1000000000000;position: fixed;top: 0;" >
+                <ul class="nav nav-pills list-inline list-unstyled" style="margin: 0px;padding:2px;overflow: hidden">
+                    <li style="float: left" ng-repeat="_user in currentuser">
+                        <img title="{{_user.name}}" class="img-polaroid" src="{{_user.avatar_large}}" style="margin-top:3px;width: 50px; height: 50px;" alt="">
+                    </li>
+                    <li style="float: left" class="active" ng-click="refresh()">
+                        <a href="" style="margin-top:2px ">
+                            <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-home">
+                                <span style="font-size: 10px" ng-bind="unreadTimeLineNum"  ng-show="unreadTimeLineNum>0" class="nav-counter nav-counter-green"></span>
+                            </span>
+                        </a>
+                    </li>
+                    <li style="float: left" >
+                        <a href="" style="margin-top:2px;width: 56px;height: 50px">
+                            <span style="margin-bottom:2px;margin-left: -2px; font-size: 34px" >
+                                <div style="margin-top: -8px;margin-left: -5px">@</div>
+                                <span style="font-size: 10px;margin-top: 1px;margin-right: 15px" class="nav-counter nav-counter-green" ng-bind="unreadAtNum" ng-show="unreadAtNum>0"></span>
+                            </span>
+                        </a>
+                    </li>
+                    <li style="float: left" >
+                        <a href="" style="margin-top:2px ">
+                            <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-comment">
+                                <span style="font-size: 10px" class="nav-counter nav-counter-green" ng-bind="unreadCommentNum" ng-show="unreadCommentNum>0"></span>
+                            </span>
+                        </a>
+                    </li>
+                    <li style="float: left" >
+                        <a href="" style="margin-top:2px ">
+                            <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-heart">
+                                <span style="font-size: 10px" class="nav-counter nav-counter-green">42</span>
+                            </span>
+                        </a>
+                    </li>
+                    <li style="float: left" >
+                        <a href="" style="margin-top:2px ">
+                            <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-user">
+                                <span style="font-size: 10px" class="nav-counter nav-counter-green">42</span>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+                <div name="loading" style="float: right;margin-top: -20px;" ng-show="loading">
+                    <div class="bubblingG" style="width: 50px">
+                        <span id="bubblingG_1">
+                        </span>
+                        <span id="bubblingG_2">
+                        </span>
+                        <span id="bubblingG_3">
+                        </span>
+                    </div>
+                </div>
+            </div>
+                <div id="warp"style="margin-top: 55px;height:535px;overflow-y:auto;overflow-x: hidden;">
+                    <div id="infodiv" class="popover right fade in" ng-click="hideinfo()" style="position: absolute">
+                        <div class="arrow"></div>
+                        <h3 class="popover-title" style="display: none;"></h3>
+                        <div class="popover-content"></div>
+                    </div>
+                    <div ng-repeat="item in timeline" ng-animate="'animate'"  class="bottom_line"
+                     style="margin-top: 10px;width: 585px;">
+                    <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
+                        <div name="avatar" style="width: 60px;float: left">
+                            <a href="http://www.weibo.com/{{item.user.profile_url}}" rclicka>
+                                <img userinfo src="{{item.user.avatar_large}}" style="width: 60px; height: 60px;" alt="" class="img-rounded">
+                            </a>
+                        </div>
+                        <div name="name&text" style=";float: left;padding: 2px;margin-left:10px;margin-bottom: 10px;min-height: 60px;width: 510px;">
+                            <a href="http://www.weibo.com/{{item.user.profile_url}}" rclicka>
+                                <b>{{item.user.name}}:</b>
+                            </a>
+                            <br>
+                            <span compile="item.text|weibotxt"></span>
+                        </div>
+                    </div>
+                    <div name="retweetedContant" style="margin-top: -5px" ng-show="item.retweeted_status">
+                        <div class="highlight arrow_box " style="text-shadow: 0 1px 0 #F9F9F9;margin-left: 70px;padding: 10px;
+                            margin-bottom: 10px;min-height: 40px;width: 510px;position: relative">
+                            <a href="http://www.weibo.com/{{item.retweeted_status.user.profile_url}}" rclicka>
+                                <b>@{{item.retweeted_status.user.name}}:</b>
+                            </a>
+                            <br>
+                            <span compile="item.retweeted_status.text|weibotxt"></span>
+
+                            <br>
+                            <div name="picContant" style=" margin-left: 0px;"  ng-show="item.retweeted_status.pic_urls.length==1">
+                                <div style="padding: 0px;">
+                                    <ul class="list-unstyled list-inline" style="margin-bottom: 0px">
+                                        <li style="padding: 10px;">
+                                            <a href="" style="position: relative;display: inline-block;">
+                                                <img rclick src="{{item.retweeted_status.thumbnail_pic}}" class="img-polaroid" title="右键新标签打开原图"  >
+                                                <img src="/img/loading.gif" class="img_loading" >
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div ng-show="item.retweeted_status.pic_urls.length>1" style="max-width: 350px">
+                                <ul class="list-unstyled list-inline">
+                                    <li style="padding: 2px;min-width: 80px;" ng-repeat="pic in item.retweeted_status.pic_urls">
+                                        <div style="position: relative">
+                                            <a href="" style="position: relative;display: inline-block;">
+                                                <img rclicks src="{{pic.thumbnail_pic|square}}" class="img-polaroid" title="右键新标签打开原图"  >
+                                                <img src="/img/loading.gif" class="img_loading" >
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div  class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
+                            </div>
+                            <div style="margin-bottom: 14px">
+                                <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;">{{(item.retweeted_status.created_at)|mydate}} 来自</div>
+                                <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;" compile="item.retweeted_status.source"></div>
+                                <div name="actionbar" style="clear:right;float: right;margin-right: 5px;margin-bottom: 3px;">
+                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-star"></span></i></a>
+                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
+                                    <a href="" class="action-re">({{item.retweeted_status.attitudes_count}})</a>
+                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
+                                    <a href="" class="action-re" ng-click="showReRepost(item.retweeted_status)">({{item.retweeted_status.reposts_count}})</a>
+                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-comment"></span></i></a>
+                                    <a href="" class="action-re" ng-click="showReComments(item.retweeted_status)">({{item.retweeted_status.comments_count}})</a>
+                                </div>
+                            </div>
+                            <div id="recommentsdiv{{item.retweeted_status.id}}" class="panel-collapse collapse"
+                                 style="margin-right:5px;margin-top: 32px;padding: 5px">
+                                <div class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px"
+                                     ng-repeat="comment in item.retweeted_status.comments" >
+                                    <div style="float: left;width: 10%">
+                                        <a href="http://www.weibo.com/{{comment.user.profile_url}}" rclicka>
+                                            <div class="avatar">
+                                                <img style="width: 40px" class="img-circle" src="{{comment.user.profile_image_url}}"/>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div style="float: left;margin-left: 8px;width: 85%">
+                                        <a href="http://www.weibo.com/{{comment.user.profile_url}}" rclicka>
+                                            <b>{{comment.user.name}}:</b>
+                                        </a>
+                                        <span compile="comment.text|weibotxt"></span>
+                                    </div>
+                                </div>
+                                <div style="float: left" ng-show="item.retweeted_status.comments_pre_page>0">
+                                    <a href="" ng-click="get_comments(item.retweeted_status,'pre')">
+                                        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                                    </a>
+
+                                </div>
+                                <div style="float: right" ng-show="item.retweeted_status.comments_next_page>0">
+                                    <a href="" ng-click="get_comments(item.retweeted_status,'next')">
+                                        <span class="glyphicon glyphicon-circle-arrow-right"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div name="picContant" style=" margin-left: 0px;"  ng-show="item.pic_urls.length==1">
+                        <div style="margin-left: 70px;padding: 0px;">
+                            <ul class="list-unstyled list-inline" style="margin-bottom: 0px">
+                                <li style="padding: 10px;">
+                                    <a href="" style="position: relative;display: inline-block;">
+                                        <img rclick src="{{item.thumbnail_pic}}" class="img-polaroid" title="右键新标签打开原图"  >
+                                        <img src="/img/loading.gif" class="img_loading" >
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div name="picsContant" style=" margin-left: 0px;"  ng-show="item.pic_urls.length>1">
+                        <div style="margin-left: 70px;padding: 0px;max-width: 350px">
+                            <ul class="list-unstyled list-inline" style="margin-bottom: 0px">
+                                <li style="padding: 2px;min-width: 80px;" ng-repeat="pic in item.pic_urls">
+                                    <a href="" style="position: relative;display: inline-block;">
+                                        <img rclicks src="{{pic.thumbnail_pic|square}}" class="img-polaroid" title="右键新标签打开原图"  >
+                                        <img src="/img/loading.gif" class="img_loading" >
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div style="margin-left: 70px">
+                        <div class="action" style="float: left;font-size: 12px;margin-top: 2px;">{{(item.created_at)|mydate}} 来自</div>
+                        <div class="action" style="float: left;font-size: 12px;margin-top: 2px;" compile="item.source"></div>
+                    </div>
+                    <div name="actionbar " style="margin-right: 5px;clear:right;float: right;">
+                        <a href="" class="action"><i><span class="glyphicon glyphicon-star"></span></i></a>
+                        <a href="" class="action"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
+                        <a href="" class="action">({{item.attitudes_count}})</a>
+                        <a href="" class="action"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
+                        <a href="" class="action" ng-click="showRepost(item)">({{item.reposts_count}})</a>
+                        <a href="" class="action"><i><span class="glyphicon glyphicon-comment"></span></i></a>
+                        <a href="" class="action" ng-click="showComments(item)">({{item.comments_count}})</a>
+                    </div>
+                    <div id="commentsdiv{{item.id}}" class="panel-collapse collapse"
+                         style="margin-left: 70px; margin-right:5px;margin-top: 32px;padding: 5px">
+
+                        <div class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px"
+                             ng-repeat="comment in item.comments" ng-animate="'animate'">
+                            <div style="float: left;width: 10%">
+                                <a href="http://www.weibo.com/{{comment.user.profile_url}}" rclicka>
+                                    <div class="avatar">
+                                        <img style="width: 40px" class="img-circle" src="{{comment.user.profile_image_url}}"/>
+                                    </div>
+                                </a>
+                            </div>
+                            <div style="float: left;margin-left: 8px;width: 85%">
+                                <a href="http://www.weibo.com/{{comment.user.profile_url}}" rclicka>
+                                    <b>{{comment.user.name}}:</b>
+                                </a>
+                                <span compile="comment.text|weibotxt"></span>
+                            </div>
+                        </div>
+                        <div style="TEXT-ALIGN: center;width: 100%">
+                            <div style="float: left" ng-show="item.comments_pre_page>0">
+                                <a href="" style="font-size: 13px" ng-click="get_comments(item,'pre')">
+                                    <span class="glyphicon glyphicon-circle-arrow-left"></span>
+                                </a>
+                            </div>
+                            <div style="float: right" ng-show="item.comments_next_page>0">
+                                <a href="" style="font-size: 13px" ng-click="get_comments(item,'next')">
+                                    <span class="glyphicon glyphicon-circle-arrow-right"></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div  class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="profile" ><div style="width: 600px"></div></div>
+        <div class="tab-pane" id="messages"><div style="width: 600px"></div></div>
+        <div class="tab-pane" id="settings"><div style="width: 600px"></div></div>
+    </div>
+</div>
+</body>
+
+<!-- In production use:
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+-->
+<script src="lib/angular/angular.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/fawave.js"></script>
+<script src="js/emoji.js"></script>
+<script src="js/app.js"></script>
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/directives.js"></script>
+<script src="js/complies.js"></script>
+</body>
+</html>

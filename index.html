@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" ng-app="myApp" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My AngularJS App</title>
+  <link rel="stylesheet" href="css/bootstrap.css"/>
+</head>
+<body style="text-shadow: 0 1px 0 #FFFFFF;background: #f5f5f5;">
+<div ng-controller="optionCtrl" style="padding: 10px">
+    <button type="button" class="btn btn-default" ng-click="authorize()">授权</button>
+
+    <ul  class="list-unstyled">
+    <li ng-repeat="_user in user">
+      <p>{{_user.name}}</p>
+      <img src="{{_user.avatar_large}}" style="width: 100px; height: 100px;" alt="" class="img-thumbnail">
+    </li>
+    </ul>
+</div>
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+  -->
+  <script src="lib/angular/angular.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script src="js/fawave.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script>
+  <script src="js/complies.js"></script>
+</body>
+</html>
