@@ -5,6 +5,7 @@
     <title>myWeibo</title>
     <link rel="stylesheet" href="css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/myweibo.css"/>
+    <link rel="stylesheet" href="css/bootstrap-checkbox.css">
     <style>
         .warp1{width:600px;margin:0 auto;}
         .head{height: 50px;}
@@ -12,7 +13,7 @@
 </head>
 <body  style="overflow:hidden;background-image: url(/img/content_inner_bg.png);height: 590px;
     text-shadow: 0 1px 0 #FFFFFF;background: rgba(248,248,248,1);font-family: '微软雅黑'" >
-<div id = "a1" ng-controller="weiboCtrl"  style="z-index: 0;overflow: hidden;height:100%;">
+<div id = "a1" ng-controller="weiboCtrl"  style="z-index: 1;overflow: hidden;height:100%;">
     <div id="tab-content" class="tab-content" style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
         <div id = "a2" class="tab-pane active" id="home" style="overflow: hidden">
             <div style="width: 600px;padding-left: 10px;position: relative;overflow: hidden" >
@@ -28,7 +29,7 @@
                             </span>
                         </a>
                     </li>
-                    <li style="float: left" >
+                    <li style="float: left" ng-click="loadAt()">
                         <a href="" style="margin-top:2px;width: 56px;height: 50px">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 34px" >
                                 <div style="margin-top: -8px;margin-left: -5px">@</div>
@@ -36,7 +37,7 @@
                             </span>
                         </a>
                     </li>
-                    <li style="float: left" >
+                    <li style="float: left" ng-click="loadComment()">
                         <a href="" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-comment">
                                 <span style="font-size: 10px" class="nav-counter nav-counter-green" ng-bind="unreadCommentNum" ng-show="unreadCommentNum>0"></span>
@@ -44,16 +45,14 @@
                         </a>
                     </li>
                     <li style="float: left" >
-                        <a href="" style="margin-top:2px ">
+                        <a href="" style="margin-top:2px " ng-click="loadFavorites()">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-heart">
-                                <span style="font-size: 10px" class="nav-counter nav-counter-green">42</span>
                             </span>
                         </a>
                     </li>
                     <li style="float: left" >
                         <a href="" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-user">
-                                <span style="font-size: 10px" class="nav-counter nav-counter-green">42</span>
                             </span>
                         </a>
                     </li>
@@ -75,7 +74,7 @@
                         <h3 class="popover-title" style="display: none;"></h3>
                         <div class="popover-content"></div>
                     </div>
-                    <div ng-repeat="item in timeline" ng-animate="'animate'"  class="bottom_line"
+                    <div ng-repeat="item in timeline track by item.id" ng-animate="'animate'"  class="bottom_line"
                      style="margin-top: 10px;width: 585px;">
                     <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
                         <div name="avatar" style="width: 60px;float: left">
@@ -204,9 +203,9 @@
                         <a href="" class="action"><i><span class="glyphicon glyphicon-star"></span></i></a>
                         <a href="" class="action"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
                         <a href="" class="action">({{item.attitudes_count}})</a>
-                        <a href="" class="action"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
+                        <a href="" class="action" ng-click="showCommentText(item,'repost',$event)"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
                         <a href="" class="action" ng-click="showRepost(item)">({{item.reposts_count}})</a>
-                        <a href="" class="action"><i><span class="glyphicon glyphicon-comment"></span></i></a>
+                        <a href="" class="action" ng-click="showCommentText(item,'comment',$event)"><i><span class="glyphicon glyphicon-comment"></span></i></a>
                         <a href="" class="action" ng-click="showComments(item)">({{item.comments_count}})</a>
                     </div>
                     <div id="commentsdiv{{item.id}}" class="panel-collapse collapse"
@@ -246,12 +245,27 @@
                 </div>
                 </div>
             </div>
+            <div class="bb-alert alert alert-info" style="display: none;">
+                <span></span>
+            </div>
+
+            </div>
         </div>
         <div class="tab-pane" id="profile" ><div style="width: 600px"></div></div>
         <div class="tab-pane" id="messages"><div style="width: 600px"></div></div>
         <div class="tab-pane" id="settings"><div style="width: 600px"></div></div>
+        <div id="comment_text_div"  class="panel panel-default shadow"
+             style="display:none; position: fixed;z-index: 9999;width:80%;padding:15px;margin-left: 70px;margin-top:320px;text-align:right;">
+            <textarea class="form-control" ng-model="commentbox.comment_txt" style="height:100px;" >
+            </textarea>
+            <input type="checkbox" data-label="转发一条微博" class="large">
+            <button class="btn btn-default" style="margin-top: 5px;" ng-click="hideCommentText()" type="button">取消</button>
+            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="comment(item)" type="button">评论</button>
+        </div>
     </div>
+
 </div>
+
 </body>
 
 <!-- In production use:
@@ -260,6 +274,7 @@
 <script src="lib/angular/angular.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.js"></script>
+<script src="js/bootstrap-checkbox.js"></script>
 <script src="js/fawave.js"></script>
 <script src="js/emoji.js"></script>
 <script src="js/app.js"></script>

@@ -36,6 +36,7 @@ angular.module('myApp.controllers', [])
                 '&grant_type=authorization_code&redirect_uri=https://api.weibo.com/oauth2/default.html';
             $http({method:'POST',url: path+param}).
                 success(function(data, status) {
+                    console.log(data);
                     $scope.$apply($scope.access_token = data.access_token);
                     $scope.$apply($scope.uid = data.uid);
                     localStorage.access_token = data.access_token;
@@ -90,26 +91,36 @@ angular.module('myApp.controllers', [])
                 $scope.status = status;
             });
         };
-        $scope.get_home_timeline = function(type){
+        $scope.get_home_timeline = function(type,api){
             var param = '?access_token='+$scope.access_token;
             if($scope.maxid!=null){
                 param = param+"&max_id="+$scope.maxid;
             }
             $scope.loading = true;
-            $http({method:'GET', url: sinaApi.config.host+sinaApi.config.home_timeline+param}).
+            if(!api)
+                api = localStorage.current_timeline_api;
+            $http({method:'GET', url: sinaApi.config.host+api+param}).
                 success(function(data, status) {
+                    if(api==sinaApi.config.favorites){
+                        data.statuses = [];
+                        for(var i in data.favorites){
+                            data.statuses[i] =  data.favorites[i].status;
+                        }
+                    }
                     if(data.statuses.length>1){
                         data.statuses.shift();
                         //区分获取最新和向下刷新
                         if(type=='refresh'){
+                            localStorage.current_timeline_api = api;
                             $scope.timeline = data.statuses;
                             $("#warp").animate({'scrollTop':0},300);
                         }else{
-                            $scope.timeline = $scope.timeline.concat(data.statuses);
+                              $scope.timeline = $scope.timeline.concat(data.statuses);
                         }
                         $scope.maxid = data.statuses[data.statuses.length-1].id;
                         chrome.extension.getBackgroundPage().timeline = $scope.timeline;
-                        localStorage.maxid = $scope.maxid;
+						chrome.extension.getBackgroundPage().scrollTop = 0;
+                        chrome.extension.getBackgroundPage().maxid = $scope.maxid;
                     }
                     $scope.loading = false;
                     $scope.unreadTimeLineNum = 0;
@@ -171,9 +182,32 @@ angular.module('myApp.controllers', [])
             var nDivHight = $("#warp").height();
             var nScrollHight = $(this)[0].scrollHeight;
             var nScrollTop = $(this)[0].scrollTop;
-            if(nScrollTop + nDivHight >= nScrollHight)
+            if(nScrollTop + nDivHight >= nScrollHight&&$scope.loading == false){
+                console.log("loadnewdata");
                 $scope.get_home_timeline();
+            }
+
+			chrome.extension.getBackgroundPage().scrollTop = nScrollTop;
+
         });
+        $scope.commentbox ={};
+        $scope.showCommentText = function(item,type,$event){
+//            $scope.commentbox.
+//            debugger;
+//            $($event.srcElement).popover({
+//                selector: '#comment_text_div'
+//            });
+            $('#comment_text_div').fadeIn();
+            if(type=="repost"&&item.retweeted_status){
+                $scope.commentbox.comment_txt = '转发微博//@'+item.user.name+":"+item.text;
+            }else{
+                $scope.commentbox.comment_txt ="";
+            }
+        };
+
+        $scope.hideCommentText = function(){
+            $('#comment_text_div').fadeOut();
+        };
 
         $scope.showComments = function(item){
             if(item.comment_type!="Comment"){
@@ -223,9 +257,49 @@ angular.module('myApp.controllers', [])
             }
         };
 
+        //comment=%E6%9D%A5%E8%87%AAAPI%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7&id=3444517204329764&access_token=2.00nKqEaBmxIJ1E16e0989ad4HwpNLD
+
+        $scope.comment = function(item){
+//            var param = "?comment="+encodeURI(commentText)+"&id="+itemid;
+//            param = param+'&access_token='+$scope.access_token;
+            var param = '?comment=%E6%9D%A5%E8%87%AAAPI%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B71&id=3444517204329764&access_token=2.00nKqEaBmxIJ1E16e0989ad4HwpNLD';
+//            $http.post(sinaApi.config.host+sinaApi.config.post_comments+param);
+            $http({
+                method:'POST',
+                url: sinaApi.config.host+sinaApi.config.post_comments,
+                data:'comment='+encodeURI(item.comment_txt)+'&id='+item.id+'&access_token='+$scope.access_token,
+                headers:{'Content-Type': 'application/x-www-form-urlencoded'}
+            }).
+                success(function(data, status) {
+                    console.log(data);
+                    Example.show("发送成功")
+                    item.comment_txt = "";
+                    $scope.showCommentText(item)
+                }).
+                error(function(data, status) {
+                    console.log(data);
+                    Example.show("发送失败")
+                });
+        };
+
         $scope.refresh = function(){
             $scope.maxid = null;
-            $scope.get_home_timeline('refresh');
+            $scope.get_home_timeline('refresh',sinaApi.config.home_timeline);
+        };
+
+        $scope.loadComment = function(){
+            $scope.maxid = null;
+            $scope.get_home_timeline('refresh',sinaApi.config.comments_timeline);
+        };
+
+        $scope.loadAt = function(){
+            $scope.maxid = null;
+            $scope.get_home_timeline('refresh',sinaApi.config.mentions_timeline);
+        };
+
+        $scope.loadFavorites = function(){
+            $scope.maxid = null;
+            $scope.get_home_timeline('refresh',sinaApi.config.favorites);
         };
 
         $scope.hideinfo = function(){
@@ -234,7 +308,8 @@ angular.module('myApp.controllers', [])
 
         if(chrome.extension.getBackgroundPage().timeline&&chrome.extension.getBackgroundPage().timeline.length>0){
             $scope.timeline = chrome.extension.getBackgroundPage().timeline
-            console.log($scope.timeline);
+            //console.log($scope.timeline);
+//            $scope.maxid = chrome.extension.getBackgroundPage().maxid ;
             $scope.maxid = $scope.timeline[$scope.timeline.length-1].id;
             $scope.unreadTimeLineNum = localStorage.unreadTimeLineNum;
             $scope.unreadCommentNum = localStorage.unreadCommentNum;
@@ -243,18 +318,42 @@ angular.module('myApp.controllers', [])
         }else{
             $scope.get_home_timeline();
         }
-
+        setTimeout(function(){
+            $("#warp")[0].scrollTop = chrome.extension.getBackgroundPage().scrollTop;
+        }, 200);
+		
         setInterval(function(){
             $scope.$apply($scope.unreadTimeLineNum = localStorage.unreadTimeLineNum);
         }, 5000);
+
+
 
      }
   ]);
 
 
 
+$(document).ready(function(){
+    var Example = (function() {
+        "use strict";
+        var elem,
+            hideHandler,
+            that = {};
+        that.init = function(options) {
+            elem = $(options.selector);
+        };
+        that.show = function(text) {
+            clearTimeout(hideHandler);
+            elem.find("span").html(text);
+            elem.delay(200).fadeIn().delay(4000).fadeOut();
+        };
+        return that;
+    }());
 
-
+    Example.init({
+        "selector": ".bb-alert"
+    });
+});
 
   
   

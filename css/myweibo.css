@@ -344,5 +344,24 @@ body::-webkit-scrollbar{
     background-image: -o-linear-gradient(top, #67a7e9, #2580df);
     background-image: linear-gradient(to bottom, #67a7e9, #2580df);
 }
-
+.bb-alert {
+    bottom: 5%;
+    font-size: 1.2em;
+    margin-bottom: 0;
+    padding: 1em 1.3em;
+    position: fixed;
+    right: 0;
+    z-index: 2000;
+}
+.alert-info {
+    background-color: #D9EDF7;
+    border-color: #BCE8F1;
+    color: #3A87AD;
+}
+.alert {
+    border: 1px solid rgba(0, 0, 0, 0);
+    border-radius: 4px 4px 4px 4px;
+    margin-bottom: 20px;
+    padding: 15px;
+}
 /*-----------------------------------------------*/
