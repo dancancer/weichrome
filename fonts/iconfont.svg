@@ -1,0 +1,37 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>
+Created by FontForge 20120731 at Sun Jan 19 21:06:47 2014
+ By Ads
+Created by Ads with FontForge 2.0 (http://fontforge.sf.net)
+</metadata>
+<defs>
+<font id="uxIconFont" horiz-adv-x="1000" >
+  <font-face 
+    font-family="iconfont"
+    font-weight="500"
+    font-stretch="normal"
+    units-per-em="1000"
+    panose-1="2 0 6 9 0 0 0 0 0 0"
+    ascent="800"
+    descent="-200"
+    bbox="33 -137 937 737"
+    underline-thickness="50"
+    underline-position="-100"
+    unicode-range="U+3564-3564"
+  />
+<missing-glyph 
+d="M33 0v666h265v-666h-265zM66 33h199v600h-199v-600z" />
+    <glyph glyph-name=".notdef" 
+d="M33 0v666h265v-666h-265zM66 33h199v600h-199v-600z" />
+    <glyph glyph-name=".null" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="nonmarkingreturn" 
+ />
+    <glyph glyph-name="uni3564" unicode="&#x3564;" 
+d="M500 737q90 0 170 -34.5t139 -93.5t93.5 -139t34.5 -170q0 -91 -34.5 -170.5t-93.5 -139t-139 -93.5t-170 -34q-91 0 -170.5 34t-139 93.5t-94 139t-34.5 170.5q0 90 34.5 170t94 139t139 93.5t170.5 34.5zM658 520q-29 0 -49 -24t-20 -58q0 -35 20 -59t49 -24t49 24
+t20 59q0 34 -20 58t-49 24zM334 518q-28 0 -47.5 -24t-19.5 -58q0 -35 19.5 -58.5t47.5 -23.5t48 23.5t20 58.5q0 34 -20 58t-48 24zM504 -25q53 0 100.5 19t85.5 52t64.5 77t37.5 94v5q0 8 -6 14.5t-15 6.5h-535q-9 0 -16.5 -6.5t-5.5 -14.5q2 -10 3 -14t2 -6
+q13 -48 40 -89.5t63.5 -72t82.5 -48t99 -17.5z" />
+  </font>
+</defs></svg>

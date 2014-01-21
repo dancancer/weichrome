@@ -16,6 +16,20 @@ angular.module('myApp.controllers', [])
 
             window.open($scope.oAuthPath);
         };
+        $scope.revokeoauth2 = function(){
+            var param = '?access_token='+$scope.access_token;
+            $http({method:'GET', url: sinaApi.config.host+sinaApi.config.revokeoauth2+param}).
+                success(function(data, status) {
+                    localStorage.access_token = "";
+                    localStorage.uid = "";
+                    $scope.user = [];
+                    chrome.extension.getBackgroundPage().timeline = [];
+                    chrome.extension.getBackgroundPage().scrollTop = 0;
+                    chrome.extension.getBackgroundPage().maxid = null;
+                }).
+                error(function(data, status) {
+                });
+        };
         chrome.tabs.onUpdated.addListener(
             function (tabId, changeInfo, tab) {
                 if (changeInfo.status === 'loading' && tab.url.indexOf(sinaApi.config.oauth_callback + '?code=') === 0 ) {
@@ -66,6 +80,7 @@ angular.module('myApp.controllers', [])
         }
   }])
   .controller('weiboCtrl', ['$scope','$http',function($scope,$http) {
+        $scope.api = sinaApi.config;
         $scope.currentuser = JSON.parse(localStorage.user);
         $scope.unreadTimeLineNum = 0;
         $scope.unreadCommentNum = 0;
@@ -99,6 +114,7 @@ angular.module('myApp.controllers', [])
             $scope.loading = true;
             if(!api)
                 api = localStorage.current_timeline_api;
+            $scope.current_timeline_api = api;
             $http({method:'GET', url: sinaApi.config.host+api+param}).
                 success(function(data, status) {
                     if(api==sinaApi.config.favorites){
@@ -107,11 +123,17 @@ angular.module('myApp.controllers', [])
                             data.statuses[i] =  data.favorites[i].status;
                         }
                     }
+                    if(api==sinaApi.config.comments_timeline){
+                        for(var i in data.comments){
+                            data.comments[i].retweeted_status = data.comments[i].status;
+
+                        }
+                        data.statuses =  data.comments;
+                    }
                     if(data.statuses.length>1){
                         data.statuses.shift();
                         //区分获取最新和向下刷新
                         if(type=='refresh'){
-                            localStorage.current_timeline_api = api;
                             $scope.timeline = data.statuses;
                             $("#warp").animate({'scrollTop':0},300);
                         }else{
@@ -191,90 +213,199 @@ angular.module('myApp.controllers', [])
 
         });
         $scope.commentbox ={};
+        $scope.currentPage = 0;
+        $scope.pageSize = 5;
+        $scope.categoryChange = function(_category){
+            $scope.current_category = {category:_category};
+        }
+
         $scope.showCommentText = function(item,type,$event){
-//            $scope.commentbox.
-//            debugger;
-//            $($event.srcElement).popover({
-//                selector: '#comment_text_div'
-//            });
+            $scope.emotions = chrome.extension.getBackgroundPage().orig_emotions;
+            $scope.emotions_category = chrome.extension.getBackgroundPage().emotions_category;
+            $scope.current_category = {category:$scope.emotions_category[0]};
             $('#comment_text_div').fadeIn();
+            if(item)
+                $scope.commentbox.id = item.id
+            $scope.commentbox.type = type;
             if(type=="repost"&&item.retweeted_status){
                 $scope.commentbox.comment_txt = '转发微博//@'+item.user.name+":"+item.text;
+                $scope.commentbox.button_txt = "转发";
             }else{
                 $scope.commentbox.comment_txt ="";
+                $scope.commentbox.button_txt = "评论";
+            }
+            if(type=="create"){
+                $scope.commentbox.comment_txt ="";
+                $scope.commentbox.button_txt = "发送";
             }
         };
 
         $scope.hideCommentText = function(){
+            $("#showEmotionsBtn").popover('hide');
+            $scope.chk_also_repost = false;
+            $scope.chk_also_comment = false;
+            $scope.chk_also_comment_orig = false;
             $('#comment_text_div').fadeOut();
         };
 
-        $scope.showComments = function(item){
+        $scope.showComments = function(item,$index){
             if(item.comment_type!="Comment"){
-                $("#commentsdiv"+item.id).collapse('show');
+                $("#commentsdiv"+$index).collapse('show');
                 item.comment_type = "Comment";
                 item.comments_page=1;
                 $scope.get_comments(item);
             }else
             {
-                $("#commentsdiv"+item.id).collapse('toggle');
+                $("#commentsdiv"+$index).collapse('toggle');
             }
         };
 
-        $scope.showReComments = function(item){
+        $scope.showReComments = function(item,$index){
             if(item.comment_type!="Comment"){
-                $("#recommentsdiv"+item.id).collapse('show');
+                $("#recommentsdiv"+$index).collapse('show');
                 item.comment_type = "Comment";
                 item.comments_page=1;
                 $scope.get_comments(item);
             }else
             {
-                $("#recommentsdiv"+item.id).collapse('toggle');
+                $("#recommentsdiv"+$index).collapse('toggle');
             }
         };
 
-        $scope.showRepost = function(item){
+        $scope.showRepost = function(item,$index){
             if(item.comment_type!="Repost"){
-                $("#commentsdiv"+item.id).collapse('show');
+                $("#commentsdiv"+$index).collapse('show');
                 item.comment_type = "Repost";
                 item.comments_page=1;
                 $scope.get_comments(item);
             }else
             {
-                $("#commentsdiv"+item.id).collapse('toggle');
+                $("#commentsdiv"+$index).collapse('toggle');
             }
         };
 
-        $scope.showReRepost = function(item){
+        $scope.showReRepost = function(item,$index){
             if(item.comment_type!="Repost"){
-                $("#recommentsdiv"+item.id).collapse('show');
+                $("#recommentsdiv"+$index).collapse('show');
                 item.comment_type = "Repost";
                 item.comments_page=1;
                 $scope.get_comments(item);
             }else
             {
-                $("#recommentsdiv"+item.id).collapse('toggle');
+                $("#recommentsdiv"+$index).collapse('toggle');
             }
         };
 
-        //comment=%E6%9D%A5%E8%87%AAAPI%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B7&id=3444517204329764&access_token=2.00nKqEaBmxIJ1E16e0989ad4HwpNLD
-
-        $scope.comment = function(item){
-//            var param = "?comment="+encodeURI(commentText)+"&id="+itemid;
-//            param = param+'&access_token='+$scope.access_token;
-            var param = '?comment=%E6%9D%A5%E8%87%AAAPI%E6%B5%8B%E8%AF%95%E5%B7%A5%E5%85%B71&id=3444517204329764&access_token=2.00nKqEaBmxIJ1E16e0989ad4HwpNLD';
-//            $http.post(sinaApi.config.host+sinaApi.config.post_comments+param);
+        $scope.create = function(){
+            if($scope.commentbox.pic){
+                $scope.upload();
+                return;
+            }
+            var api = sinaApi.config.update;
+            var _data = 'status='+encodeURI($scope.commentbox.comment_txt)+
+                '&access_token='+$scope.access_token;
+            var _header = {'Content-Type': 'application/x-www-form-urlencoded'}
             $http({
                 method:'POST',
-                url: sinaApi.config.host+sinaApi.config.post_comments,
-                data:'comment='+encodeURI(item.comment_txt)+'&id='+item.id+'&access_token='+$scope.access_token,
+                url: sinaApi.config.host+api,
+                data:_data.blob,
+                dataType:'text',
+                headers:_header
+            }).
+                success(function(data, status) {
+                    console.log(data);
+                    Example.show("发送成功")
+                    $scope.commentbox.comment_txt = "";
+                    $scope.hideCommentText()
+                    $scope.chk_also_repost= false;
+                    $scope.chk_also_comment = false;
+                    $scope.chk_also_comment_orig = false;
+                }).
+                error(function(data, status) {
+                    console.log(data);
+                    Example.show("发送失败")
+                });
+        }
+
+        $scope.upload = function(){
+            var _data = bulidUploadParam($scope.commentbox.pic,{
+                'status':encodeURI($scope.commentbox.comment_txt),
+                'access_token':$scope.access_token
+            });
+            var api = sinaApi.config.upload;
+            var _header = {'Content-Type': 'multipart/form-data; boundary='+_data.boundary}
+
+            $.ajax({
+                    url : sinaApi.config.host+api,
+                    cache : false,
+                    timeout : 5 * 60 * 1000,
+                    type : 'post',
+                    data : _data.blob,
+                    dataType : 'text',
+                    contentType : 'multipart/form-data; boundary=' + _data.boundary,
+                    processData : false,
+                    beforeSend : function(req) {
+                        for ( var k in _data.auth_args.headers) {
+                            req.setRequestHeader(k, _data.auth_args.headers[k]);
+                        }
+                    },
+                    success : function(data, textStatus, xhr) {
+                        console.log(data);
+                        Example.show("发送成功")
+                        $scope.commentbox.comment_txt = "";
+                        $scope.hideCommentText()
+                        $scope.chk_also_repost= false;
+                        $scope.chk_also_comment = false;
+                        $scope.chk_also_comment_orig = false;
+                    },
+                    error : function(xhr, textStatus, errorThrown) {
+                        console.log(data);
+                        Example.show("发送失败")                    }
+                });
+        }
+
+        $scope.comment = function(){
+            debugger;
+            var api = sinaApi.config.post_comments;
+            var _data = 'comment='+encodeURI($scope.commentbox.comment_txt)+
+                '&id='+$scope.commentbox.id+'&access_token='+$scope.access_token;
+            if($scope.commentbox.type=='create'){
+                $scope.create();
+                return;
+            }
+            if ($scope.commentbox.type=='repost'){
+                api = sinaApi.config.repost;
+                var is_comment = 0;
+                if($scope.chk_also_comment)
+                    is_comment = 1;
+                if($scope.chk_also_comment_orig)
+                    is_comment = 2;
+                if($scope.chk_also_comment&chk_also_comment_orig)
+                    is_comment = 3;
+                _data = 'status='+encodeURI($scope.commentbox.comment_txt)+
+                    '&is_comment='+is_comment+'&id='+$scope.commentbox.id+'&access_token='+$scope.access_token;
+            }else{
+                if(chk_also_repost){
+                    api = sinaApi.config.repost;
+                    _data = 'status='+encodeURI($scope.commentbox.comment_txt)+
+                        '&is_comment=1&id='+$scope.commentbox.id+'&access_token='+$scope.access_token;
+                }
+
+            }
+            $http({
+                method:'POST',
+                url: sinaApi.config.host+api,
+                data:_data,
                 headers:{'Content-Type': 'application/x-www-form-urlencoded'}
             }).
                 success(function(data, status) {
                     console.log(data);
                     Example.show("发送成功")
-                    item.comment_txt = "";
-                    $scope.showCommentText(item)
+                    $scope.commentbox.comment_txt = "";
+                    $scope.hideCommentText()
+                    $scope.chk_also_repost= false;
+                    $scope.chk_also_comment = false;
+                    $scope.chk_also_comment_orig = false;
                 }).
                 error(function(data, status) {
                     console.log(data);
@@ -283,33 +414,125 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.refresh = function(){
+            $("li.active").removeClass("active");
+            $("#home_btn").addClass("active");
+            localStorage.current_icon = "#home_btn";
+            localStorage.current_timeline_api = sinaApi.config.home_timeline;
             $scope.maxid = null;
             $scope.get_home_timeline('refresh',sinaApi.config.home_timeline);
         };
 
         $scope.loadComment = function(){
+            $("li.active").removeClass("active");
+            $("#comment_btn").addClass("active");
+            localStorage.current_icon = "#comment_btn";
+            localStorage.current_timeline_api = sinaApi.config.comments_timeline;
             $scope.maxid = null;
             $scope.get_home_timeline('refresh',sinaApi.config.comments_timeline);
         };
 
         $scope.loadAt = function(){
+            $("li.active").removeClass("active");
+            $("#at_btn").addClass("active");
+            localStorage.current_icon = "#at_btn";
+            localStorage.current_timeline_api = sinaApi.config.mentions_timeline;
             $scope.maxid = null;
             $scope.get_home_timeline('refresh',sinaApi.config.mentions_timeline);
         };
 
         $scope.loadFavorites = function(){
+            $("li.active").removeClass("active");
+            $("#favorite_btn").addClass("active");
+            localStorage.current_icon = "#favorite_btn";
             $scope.maxid = null;
             $scope.get_home_timeline('refresh',sinaApi.config.favorites);
         };
+
+
+        $scope.atList = [];
+        $scope.loadFriends = function(cursor){
+            var param = '?access_token='+$scope.access_token+"&uid="+$scope.uid+"&count=200&cursor="+cursor;
+            var url = sinaApi.config.host+sinaApi.config.friends+param;
+            $http({method:'GET', url: url}).
+                success(function(data, status) {
+                    if(data.next_cursor!=0){
+                        $scope.loadFriends(data.next_cursor);
+                    }
+                    $.each(data.users,function(i,n){
+                        $scope.atList[$scope.atList.length] = {name:n.name,screen_name:n.screen_name}
+                    })
+                }).
+                error(function(data, status) {
+                });
+        };
+
+        $scope.loadFriends(0);
 
         $scope.hideinfo = function(){
             $("#infodiv").hide();
         };
 
+        $scope.addItem2Editor = function(item){
+
+        };
+
+        $scope.handleFileSelect = function(evt) {
+            console.log(evt);
+            if(evt&&evt.target.files){
+                debugger;
+                var files = evt.target.files; // FileList object
+                EXIF.getData(evt.target.files[0], function() {
+                    $scope.commentbox.comment_txt =  EXIF.pretty($("#upload_img"));
+                });
+                // Loop through the FileList and render image files as thumbnails.
+                for (var i = 0, f; f = files[i]; i++) {
+                    // Only process image files.
+                    if (!f.type.match('image.*')) {
+                        continue;
+                    }
+                    $scope.commentbox.pic = f;
+                    var reader1 = new FileReader();
+                    var reader2 = new FileReader();
+                    var reader3 = new FileReader();
+                    // Closure to capture the file information.
+                    reader1.onload = (function(theFile) {
+                        return function(e) {
+                            // Render thumbnail.
+                            var span = document.createElement('span');
+                            span.innerHTML = ['<img class="img-thumbnail"  class="thumb" style="max-width: 200px;max-height: 200px" id="upload_img" src="', e.target.result,
+                                '" title="', escape(theFile.name), '"/>'].join('');
+                            document.getElementById('list').insertBefore(span, null);
+                        };
+                    })(f);
+
+                    reader3.onloadend = function() {
+                        var exif = EXIF.readFromBinaryFile(new BinaryFile(this.result));
+                        if(exif!='false')
+                            $scope.commentbox.comment_txt = buildExifStr(exif);
+                    };
+                    reader1.readAsDataURL(f);
+                    reader3.readAsBinaryString(f);
+                }
+            }
+        }
+
+        $('#files').on('change',function(event){
+            $scope.handleFileSelect(event);
+        });
+        $scope.selectImg = function(){
+            $('#files').click();
+        }
+        $scope.showEmotions = function(){
+            $('#emotions_div').show();
+            $("#showEmotionsBtn").popover('toggle');
+        }
+
+        $scope.insertEmotion = function(emotion){
+            insertText($("#comment_textarea")[0],emotion);
+        }
+
         if(chrome.extension.getBackgroundPage().timeline&&chrome.extension.getBackgroundPage().timeline.length>0){
             $scope.timeline = chrome.extension.getBackgroundPage().timeline
-            //console.log($scope.timeline);
-//            $scope.maxid = chrome.extension.getBackgroundPage().maxid ;
             $scope.maxid = $scope.timeline[$scope.timeline.length-1].id;
             $scope.unreadTimeLineNum = localStorage.unreadTimeLineNum;
             $scope.unreadCommentNum = localStorage.unreadCommentNum;
@@ -317,9 +540,26 @@ angular.module('myApp.controllers', [])
 
         }else{
             $scope.get_home_timeline();
+            localStorage.current_icon = "#home_btn";
         }
+
+        if(!localStorage.current_timeline_api)
+            $scope.current_timeline_api = sinaApi.config.home_timeline;
+        else
+            $scope.current_timeline_api = localStorage.current_timeline_api;
+        if(!localStorage.current_icon)
+            localStorage.current_icon = "#home_btn"
+        $("li.active").removeClass("active");
+        $(localStorage.current_icon).addClass("active");
+
         setTimeout(function(){
             $("#warp")[0].scrollTop = chrome.extension.getBackgroundPage().scrollTop;
+            $("#showEmotionsBtn").popover({
+                placement : 'bottom', // top, bottom, left or right
+                html: 'true',
+                content : $('#emotions_div'),
+                trigger: 'manual'
+            });
         }, 200);
 		
         setInterval(function(){
@@ -331,29 +571,22 @@ angular.module('myApp.controllers', [])
      }
   ]);
 
+var Example = (function() {
+    "use strict";
+    var elem,
+        hideHandler,
+        that = {};
+    that.init = function(options) {
+        elem = $(options.selector);
+    };
+    that.show = function(text) {
+        clearTimeout(hideHandler);
+        elem.find("span").html(text);
+        elem.delay(200).fadeIn().delay(4000).fadeOut();
+    };
+    return that;
+}());
 
-
-$(document).ready(function(){
-    var Example = (function() {
-        "use strict";
-        var elem,
-            hideHandler,
-            that = {};
-        that.init = function(options) {
-            elem = $(options.selector);
-        };
-        that.show = function(text) {
-            clearTimeout(hideHandler);
-            elem.find("span").html(text);
-            elem.delay(200).fadeIn().delay(4000).fadeOut();
-        };
-        return that;
-    }());
-
-    Example.init({
-        "selector": ".bb-alert"
-    });
+Example.init({
+    "selector": ".bb-alert"
 });
-
-  
-  

@@ -18,6 +18,13 @@ angular.module('myApp.filters', []).
             return text.replace('thumbnail', 'square')
         }
     })
+    .filter('startFrom', function() {
+        return function(input, start) {
+            start = +start; //parse to int
+            if(input)
+                return input.slice(start);
+        }
+    })
     .filter('weibotxt', function () {
         return function (text) {
             var uniq = function (arr) {

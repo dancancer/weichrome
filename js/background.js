@@ -9,6 +9,26 @@
 
 var timeline = new Array();
 var emotions= new Array();
+var orig_emotions = [];
+var emotions_category = [];
+var uniq = function (arr) {
+    if (arr && arr.length >= 1) {
+        var a = [], o = {}, i, v, len = arr.length;
+        if (len < 2) {
+            return arr;
+        }
+        for (i = 0; i < len; i++) {
+            v = arr[i];
+            if (o[v] !== 1) {
+                a.push(v);
+                o[v] = 1;
+            }
+        }
+        return a;
+    } else {
+        return a;
+    }
+}
 var getUnreadCount =function(){
     var access_token = localStorage.access_token;
     var param = '?access_token='+access_token+'&uid='+uid+'&unread_message=1';
@@ -18,9 +38,6 @@ var getUnreadCount =function(){
             localStorage.unreadTimeLineNum = data.status;
             localStorage.unreadCommentNum = data.cmt;
             localStorage.unreadAtNum = data.mention_status;
-            console.log(localStorage.unreadTimeLineNum);
-            console.log(localStorage.unreadCommentNum);
-            console.log(localStorage.unreadAtNum);
             if(data.status>0){
                 chrome.browserAction.setBadgeText({text:''+data.status}) ;
             }else{
@@ -31,20 +48,35 @@ var getUnreadCount =function(){
 
 $.getJSON("js/emotions.json",function(data){
     for(var i in data){
-            emotions[data[i].value+""] = data[i].url;;
+            if(data[i].category=="")
+                data[i].category = '\u5e38\u7528';
+            emotions[data[i].value+""] = data[i].url;
+            emotions_category[i] = data[i].category;
+
     }
+    emotions_category = uniq(emotions_category);
+    orig_emotions = data;
+    console.log(emotions_category);
     });
 
-$.getJSON(sinaApi.host+sinaApi.emotions+'?access_token='+localStorage.access_token,
+$.getJSON(sinaApi.config.host+sinaApi.config.emotions+'?access_token='+localStorage.access_token,
     function(data){
         var _emotions = new Array();
-        console.log(data);
         for(var i in data){
-                _emojis[data[i].value+""] = data[i].url;
+            if(data[i].category=="")
+                data[i].category = "\u5e38\u7528";
+            _emotions[data[i].value+""] = data[i].url;
+            emotions_category[i] = data[i].category;
+
+
         }
         if(_emotions.length>0){
             emotions = _emotions;
         }
+        orig_emotions = data;
+        emotions_category = uniq(emotions_category);
+        console.log("\u5e38\u7528");
+        console.log(emotions_category);
     });
 
 

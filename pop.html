@@ -22,37 +22,43 @@
                     <li style="float: left" ng-repeat="_user in currentuser">
                         <img title="{{_user.name}}" class="img-polaroid" src="{{_user.avatar_large}}" style="margin-top:3px;width: 50px; height: 50px;" alt="">
                     </li>
-                    <li style="float: left" class="active" ng-click="refresh()">
+                    <li style="float: left" id="home_btn" class="active" ng-click="refresh()">
                         <a href="" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-home">
                                 <span style="font-size: 10px" ng-bind="unreadTimeLineNum"  ng-show="unreadTimeLineNum>0" class="nav-counter nav-counter-green"></span>
                             </span>
                         </a>
                     </li>
-                    <li style="float: left" ng-click="loadAt()">
+                    <li style="float: left" id="at_btn" ng-click="loadAt()">
                         <a href="" style="margin-top:2px;width: 56px;height: 50px">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 34px" >
-                                <div style="margin-top: -8px;margin-left: -5px">@</div>
+                                <div style="margin-top: -8px;margin-left: -5px;font-weight: bolder;">@</div>
                                 <span style="font-size: 10px;margin-top: 1px;margin-right: 15px" class="nav-counter nav-counter-green" ng-bind="unreadAtNum" ng-show="unreadAtNum>0"></span>
                             </span>
                         </a>
                     </li>
-                    <li style="float: left" ng-click="loadComment()">
+                    <li style="float: left" id="comment_btn" ng-click="loadComment()">
                         <a href="" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-comment">
                                 <span style="font-size: 10px" class="nav-counter nav-counter-green" ng-bind="unreadCommentNum" ng-show="unreadCommentNum>0"></span>
                             </span>
                         </a>
                     </li>
-                    <li style="float: left" >
+                    <li style="float: left" id="favorite_btn">
                         <a href="" style="margin-top:2px " ng-click="loadFavorites()">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-heart">
                             </span>
                         </a>
                     </li>
-                    <li style="float: left" >
+                    <li style="float: left;display: none;" id="userinfo_btn">
                         <a href="" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-user">
+                            </span>
+                        </a>
+                    </li>
+                    <li style="float: left" id="create_btn">
+                        <a href="" style="margin-top:2px " ng-click="showCommentText(null,'create')">
+                            <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-pencil">
                             </span>
                         </a>
                     </li>
@@ -117,7 +123,7 @@
                                     <li style="padding: 2px;min-width: 80px;" ng-repeat="pic in item.retweeted_status.pic_urls">
                                         <div style="position: relative">
                                             <a href="" style="position: relative;display: inline-block;">
-                                                <img rclicks src="{{pic.thumbnail_pic|square}}" class="img-polaroid" title="右键新标签打开原图"  >
+                                                <img rclicks src="{{pic.thumbnail_pic|square}}" style="min-width: 50px" class="img-polaroid" title="右键新标签打开原图"  >
                                                 <img src="/img/loading.gif" class="img_loading" >
                                             </a>
                                         </div>
@@ -129,17 +135,17 @@
                             <div style="margin-bottom: 14px">
                                 <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;">{{(item.retweeted_status.created_at)|mydate}} 来自</div>
                                 <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;" compile="item.retweeted_status.source"></div>
-                                <div name="actionbar" style="clear:right;float: right;margin-right: 5px;margin-bottom: 3px;">
-                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-star"></span></i></a>
+                                <div ng-show="current_timeline_api!=api.comments_timeline" name="actionbar" style="clear:right;float: right;margin-right: 5px;margin-bottom: 3px;">
+                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-heart"></span></i></a>
                                     <a href="" class="action-re"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
                                     <a href="" class="action-re">({{item.retweeted_status.attitudes_count}})</a>
-                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
-                                    <a href="" class="action-re" ng-click="showReRepost(item.retweeted_status)">({{item.retweeted_status.reposts_count}})</a>
-                                    <a href="" class="action-re"><i><span class="glyphicon glyphicon-comment"></span></i></a>
-                                    <a href="" class="action-re" ng-click="showReComments(item.retweeted_status)">({{item.retweeted_status.comments_count}})</a>
+                                    <a href="" class="action-re" ng-click="showCommentText(item.retweeted_status,'repost',$event)"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
+                                    <a href="" class="action-re" ng-click="showReRepost(item.retweeted_status,$index)">({{item.retweeted_status.reposts_count}})</a>
+                                    <a href="" class="action-re" ng-click="showCommentText(item.retweeted_status,'comment',$event)"><i><span class="glyphicon glyphicon-comment"></span></i></a>
+                                    <a href="" class="action-re" ng-click="showReComments(item.retweeted_status,$index)">({{item.retweeted_status.comments_count}})</a>
                                 </div>
                             </div>
-                            <div id="recommentsdiv{{item.retweeted_status.id}}" class="panel-collapse collapse"
+                            <div id="recommentsdiv{{$index}}" class="panel-collapse collapse"
                                  style="margin-right:5px;margin-top: 32px;padding: 5px">
                                 <div class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px"
                                      ng-repeat="comment in item.retweeted_status.comments" >
@@ -199,16 +205,16 @@
                         <div class="action" style="float: left;font-size: 12px;margin-top: 2px;">{{(item.created_at)|mydate}} 来自</div>
                         <div class="action" style="float: left;font-size: 12px;margin-top: 2px;" compile="item.source"></div>
                     </div>
-                    <div name="actionbar " style="margin-right: 5px;clear:right;float: right;">
-                        <a href="" class="action"><i><span class="glyphicon glyphicon-star"></span></i></a>
+                    <div name="actionbar " ng-show="current_timeline_api!=api.comments_timeline" style="margin-right: 5px;clear:right;float: right;">
+                        <a href="" class="action"><i><span class="glyphicon glyphicon-heart"></span></i></a>
                         <a href="" class="action"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
                         <a href="" class="action">({{item.attitudes_count}})</a>
                         <a href="" class="action" ng-click="showCommentText(item,'repost',$event)"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
-                        <a href="" class="action" ng-click="showRepost(item)">({{item.reposts_count}})</a>
+                        <a href="" class="action" ng-click="showRepost(item,$index)">({{item.reposts_count}})</a>
                         <a href="" class="action" ng-click="showCommentText(item,'comment',$event)"><i><span class="glyphicon glyphicon-comment"></span></i></a>
-                        <a href="" class="action" ng-click="showComments(item)">({{item.comments_count}})</a>
+                        <a href="" class="action" ng-click="showComments(item,$index)">({{item.comments_count}})</a>
                     </div>
-                    <div id="commentsdiv{{item.id}}" class="panel-collapse collapse"
+                    <div id="commentsdiv{{$index}}" class="panel-collapse collapse"
                          style="margin-left: 70px; margin-right:5px;margin-top: 32px;padding: 5px">
 
                         <div class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px"
@@ -255,12 +261,62 @@
         <div class="tab-pane" id="messages"><div style="width: 600px"></div></div>
         <div class="tab-pane" id="settings"><div style="width: 600px"></div></div>
         <div id="comment_text_div"  class="panel panel-default shadow"
-             style="display:none; position: fixed;z-index: 9999;width:80%;padding:15px;margin-left: 70px;margin-top:320px;text-align:right;">
-            <textarea class="form-control" ng-model="commentbox.comment_txt" style="height:100px;" >
+             style="display:none; position: fixed;z-index: 9999;width:80%;padding:15px;margin-left: 70px;margin-top:120px;text-align:right;">
+            <textarea class="form-control" id="comment_textarea" ng-model="commentbox.comment_txt" style="height:100px;" >
             </textarea>
-            <input type="checkbox" data-label="转发一条微博" class="large">
-            <button class="btn btn-default" style="margin-top: 5px;" ng-click="hideCommentText()" type="button">取消</button>
-            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="comment(item)" type="button">评论</button>
+            <div style="float: left;margin-top: 15px;margin-left: 5px">
+                <a href="" id="showEmotionsBtn" class="action" ng-click="showEmotions()"><i class="iconfont">&#x3564</i></a>
+                <a href="" class="action" ng-show="commentbox.type=='create'" ng-click="selectImg()"><i><span class="glyphicon glyphicon-picture"></span></i></a>
+                <input type="checkbox" ng-model="chk_also_repost" style="display: none">
+                <a href="" class="action" ng-show="commentbox.type=='comment'" ng-click="chk_also_repost=!chk_also_repost">
+                    <i><span ng-class="{'glyphicon':true,'glyphicon-check':chk_also_repost,'glyphicon-unchecked':!chk_also_repost}"></span></i>同时转发
+                </a>
+                <input  type="checkbox" ng-model="chk_also_comment" style="display: none">
+                <a href="" class="action" ng-show="commentbox.type=='repost'" ng-click="chk_also_comment=!chk_also_comment">
+                    <i><span ng-class="{'glyphicon':true,'glyphicon-check':chk_also_comment,'glyphicon-unchecked':!chk_also_comment}"></span></i>同时评论
+                </a>
+                <input  type="checkbox" ng-model="chk_also_comment_orig" style="display: none">
+                <a href="" class="action" ng-show="commentbox.type=='repost'" ng-click="chk_also_comment_orig=!chk_also_comment_orig">
+                    <i><span ng-class="{'glyphicon':true,'glyphicon-check':chk_also_comment_orig,'glyphicon-unchecked':!chk_also_comment_orig}"></span></i>同时评论原文
+                </a>
+                <input type="file" id="files" name="files[]" multiple style="display: none" />
+                <output id="list"></output>
+            </div>
+            <div style="float: right;margin-top: 5px;">
+                <button class="btn btn-default" style="margin-top: 5px;" ng-click="hideCommentText()" type="button">取消</button>
+                <button class="btn btn-primary" style="margin-top: 5px;" ng-click="comment()" type="button">{{commentbox.button_txt}}</button>
+            </div>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="display: none">
+                <li ng-repeat="atItem in atList | filter:commentbox.comment_txt" role="presentation">
+                    <a role="menuitem" tabindex="-1" href="" ng-click="addItem2Editor(atItem)">{{atItem.name}}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="row" id="emotions_div" style="width: 410px;padding: 10px;display: none">
+            <ul class="list-unstyled list-inline" style="display: block;float: left;width: 100%">
+                <li style="padding: 2px;min-width: 20px;float: left" >
+                    <button type="button" class="btn btn-link btn-sm" ng-init="currentPage=0" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1" >
+                        <i><span class="glyphicon glyphicon-chevron-left"></span></i>
+                    </button>
+                </li>
+                <li style="padding: 2px;min-width: 20px;float: left" ng-repeat="category in emotions_category|startFrom:currentPage*pageSize | limitTo:pageSize">
+                    <a href="" style="position: relative;display: inline-block;" ng-click="categoryChange(category)">
+                        [{{category}}]
+                    </a>
+                </li>
+                <li style="padding: 2px;min-width: 20px;float: right" >
+                    <button type="button" class="btn btn-link btn-sm" ng-disabled="currentPage >= emotions_category.length/pageSize - 1"  ng-click="currentPage=currentPage+1">
+                        <i><span class="glyphicon glyphicon-chevron-right"></span></i>
+                    </button>
+                </li>
+            </ul>
+            <ul class="list-unstyled list-inline" style="display: block;float: left">
+                <li style="padding: 2px;min-width: 20px;" ng-repeat="emotion in emotions|filter:current_category">
+                    <a href="" style="position: relative;display: inline-block;" ng-click="insertEmotion(emotion.phrase)">
+                        <img src="{{emotion.url}}">
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
@@ -273,9 +329,10 @@
 -->
 <script src="lib/angular/angular.js"></script>
 <script src="js/jquery.min.js"></script>
+<script src="js/exif.js"></script>
+<script src="js/binaryajax.js"></script>
 <script src="js/bootstrap.js"></script>
-<script src="js/bootstrap-checkbox.js"></script>
-<script src="js/fawave.js"></script>
+<script src="js/api.js"></script>
 <script src="js/emoji.js"></script>
 <script src="js/app.js"></script>
 <script src="js/services.js"></script>
@@ -283,5 +340,6 @@
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>
 <script src="js/complies.js"></script>
+<script src="js/util.js"></script>
 </body>
 </html>
