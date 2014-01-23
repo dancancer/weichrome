@@ -122,7 +122,7 @@ function buildExifStr(exif){
     if(exif.FocalLength&&exif.FocalLength.numerator&&exif.FocalLength.denominator)
         FocalLength = Math.round(exif.FocalLength.numerator/exif.FocalLength.denominator)+"mm, "
     if(exif.FNumber&&exif.FNumber.numerator&&exif.FNumber.denominator)
-        FNumber = " f/"+(exif.FNumber.numerator/exif.FNumber.denominator).toFixed(1);
+        FNumber = " f/"+(exif.FNumber.numerator/exif.FNumber.denominator).toFixed(1)+", ";
     if(exif.ExposureTime&&exif.ExposureTime.numerator>=exif.ExposureTime.denominator)
         ExposureTime = Math.round(exif.ExposureTime.numerator/exif.ExposureTime.denominator)+"s, ";
     else if(exif.ExposureTime&&exif.ExposureTime.numerator<exif.ExposureTime.denominator)

@@ -76,13 +76,21 @@ angular.module('myApp.filters', []).
                         text = text.replace(reg, url);
                     }
                 }
-                //替换emoji
-                for (var j = 0; j < emoji.length; j++) {
-                    // For block/background style
-                    // oldHtml = oldHtml.replace(emoji[j], '<span style="display: inline-block; background-image: url(img/' + to_hex(emoji[j]) + '.png); background-size: ' + size + 'px; height: ' + size + 'px; width: ' + size + 'px;"></span>');
-                    // For classic img style
-                    text = text.replace(emoji[j], '<img src="img/unicode/' + to_hex(emoji[j]) + '.png" height="' + 24 + '" width="' + 24 + '" />');
-                }
+//                //替换emoji
+//                for (var j = 0; j < emoji.length; j++) {
+//                    // For block/background style
+//                    // oldHtml = oldHtml.replace(emoji[j], '<span style="display: inline-block; background-image: url(img/' + to_hex(emoji[j]) + '.png); background-size: ' + size + 'px; height: ' + size + 'px; width: ' + size + 'px;"></span>');
+//                    // For classic img style
+//                    text = text.replace(emoji[j], '<img src="img/unicode/' + to_hex(emoji[j]) + '.png" height="' + 24 + '" width="' + 24 + '" />');
+//                }
+
+//                var $text = $('.emojstext');
+//                var html = $text.html().trim().replace(/\n/g, '<br/>');
+                text = jEmoji.softbankToUnified(text);
+                text = jEmoji.googleToUnified(text);
+                text = jEmoji.docomoToUnified(text);
+                text = jEmoji.kddiToUnified(text);
+                text = jEmoji.unifiedToHTML(text);
 
                 return text;
             }

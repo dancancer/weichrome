@@ -103,6 +103,11 @@ a:visited { text-decoration: none;}
     color: #6e6e6e;
 }
 
+.action-h{
+    font-size: 10px;
+    /*color: #b3b3b3;*/
+}
+
 body{
     color: rgb(90, 90, 90);
 }

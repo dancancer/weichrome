@@ -80,5 +80,6 @@ $.getJSON(sinaApi.config.host+sinaApi.config.emotions+'?access_token='+localStor
     });
 
 
-
+localStorage.current_timeline_api = sinaApi.config.home_timeline;
+localStorage.current_icon = "#home_btn";
 setInterval(getUnreadCount, 5000);

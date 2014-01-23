@@ -12,6 +12,11 @@ angular.module('myApp.controllers', [])
         $scope.timeline = new Array();
 
         $scope.authorize = function(){
+            chrome.extension.getBackgroundPage().timeline = [];
+            chrome.extension.getBackgroundPage().scrollTop = 0;
+            chrome.extension.getBackgroundPage().maxid = null;
+            localStorage.access_token = null;
+            localStorage.uid = null;
             $scope.oAuthPath = 'https://api.weibo.com/oauth2/authorize?client_id='+sinaApi.config.oauth_key+'&redirect_uri=https://api.weibo.com/oauth2/default.html&response_type=code';
 
             window.open($scope.oAuthPath);
@@ -92,20 +97,34 @@ angular.module('myApp.controllers', [])
         $scope.user=[];
         $scope.maxid=null;
         $scope.isloading = false;
+        $scope.isAuth = true;
         $scope.timeline = new Array();
         $scope.loading = false;
+        $scope.chk_also_comment = false;
+        $scope.chk_also_comment_orig = false;
+        $scope.chk_also_repost = false;
+
+        $scope.gotoOption = function(){
+            chrome.extension.getOptions
+            chrome.tabs.create({"url":"chrome-extension://pnkacoeejlfoikeaiobjennblgpoaaao/option.html","selected":true}, function(tab){
+            });
+        }
+
         $scope.getuserinfo = function(uid){
             var param = '?access_token='+$scope.access_token+'&uid='+$scope.uid;
             $http({method:'GET', url: sinaApi.config.host+sinaApi.config.user_show+param}).
               success(function(data, status) {
                 $scope.user = [];
                 $scope.user.push(data);
+                $scope.isAuth = true;
               }).
               error(function(data, status) {
+                $scope.isAuth = false;
                 $scope.data = data || "Request failed";
                 $scope.status = status;
             });
         };
+
         $scope.get_home_timeline = function(type,api){
             var param = '?access_token='+$scope.access_token;
             if($scope.maxid!=null){
@@ -223,6 +242,7 @@ angular.module('myApp.controllers', [])
             $scope.emotions = chrome.extension.getBackgroundPage().orig_emotions;
             $scope.emotions_category = chrome.extension.getBackgroundPage().emotions_category;
             $scope.current_category = {category:$scope.emotions_category[0]};
+            $scope.commentbox.pic = null;
             $('#comment_text_div').fadeIn();
             if(item)
                 $scope.commentbox.id = item.id
@@ -241,6 +261,7 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.hideCommentText = function(){
+            $scope.commentbox.pic = null;
             $("#showEmotionsBtn").popover('hide');
             $scope.chk_also_repost = false;
             $scope.chk_also_comment = false;
@@ -301,6 +322,7 @@ angular.module('myApp.controllers', [])
                 $scope.upload();
                 return;
             }
+            debugger;
             var api = sinaApi.config.update;
             var _data = 'status='+encodeURI($scope.commentbox.comment_txt)+
                 '&access_token='+$scope.access_token;
@@ -308,7 +330,7 @@ angular.module('myApp.controllers', [])
             $http({
                 method:'POST',
                 url: sinaApi.config.host+api,
-                data:_data.blob,
+                data:_data,
                 dataType:'text',
                 headers:_header
             }).
@@ -365,7 +387,6 @@ angular.module('myApp.controllers', [])
         }
 
         $scope.comment = function(){
-            debugger;
             var api = sinaApi.config.post_comments;
             var _data = 'comment='+encodeURI($scope.commentbox.comment_txt)+
                 '&id='+$scope.commentbox.id+'&access_token='+$scope.access_token;
@@ -380,12 +401,12 @@ angular.module('myApp.controllers', [])
                     is_comment = 1;
                 if($scope.chk_also_comment_orig)
                     is_comment = 2;
-                if($scope.chk_also_comment&chk_also_comment_orig)
+                if($scope.chk_also_comment&$scope.chk_also_comment_orig)
                     is_comment = 3;
                 _data = 'status='+encodeURI($scope.commentbox.comment_txt)+
                     '&is_comment='+is_comment+'&id='+$scope.commentbox.id+'&access_token='+$scope.access_token;
             }else{
-                if(chk_also_repost){
+                if($scope.chk_also_repost){
                     api = sinaApi.config.repost;
                     _data = 'status='+encodeURI($scope.commentbox.comment_txt)+
                         '&is_comment=1&id='+$scope.commentbox.id+'&access_token='+$scope.access_token;
@@ -412,6 +433,32 @@ angular.module('myApp.controllers', [])
                     Example.show("发送失败")
                 });
         };
+
+        $scope.favorite = function(item){
+            var api = sinaApi.config.add_favorites;
+            var _data = '&id='+item.id+'&access_token='+$scope.access_token;
+            if(item.favorited)
+                api = sinaApi.config.remove_favorites;
+            $http({
+                method:'POST',
+                url: sinaApi.config.host+api,
+                data:_data,
+                headers:{'Content-Type': 'application/x-www-form-urlencoded'}
+            }).
+                success(function(data, status) {
+                    console.log(data);
+                    item.favorited = data.status.favorited;
+                    if(item.favorited)
+                        Example.show("收藏成功")
+                    else
+                        Example.show("移除收藏成功")
+                    chrome.extension.getBackgroundPage().timeline = $scope.timeline;
+                }).
+                error(function(data, status) {
+                    console.log(data);
+                    Example.show("操作失败")
+                });
+        }
 
         $scope.refresh = function(){
             $("li.active").removeClass("active");
@@ -499,9 +546,12 @@ angular.module('myApp.controllers', [])
                         return function(e) {
                             // Render thumbnail.
                             var span = document.createElement('span');
-                            span.innerHTML = ['<img class="img-thumbnail"  class="thumb" style="max-width: 200px;max-height: 200px" id="upload_img" src="', e.target.result,
+                            span.innerHTML = ['<img class="thumb" style="max-width: 200px;max-height: 200px" id="upload_img" src="', e.target.result,
                                 '" title="', escape(theFile.name), '"/>'].join('');
-                            document.getElementById('list').insertBefore(span, null);
+                            $("#uploadimg_div").show();
+                            $("#selectImgBtn").popover('show');
+                            $('#imglist')[0].innerHTML = span.innerHTML;
+
                         };
                     })(f);
 
@@ -543,6 +593,11 @@ angular.module('myApp.controllers', [])
             localStorage.current_icon = "#home_btn";
         }
 
+        if($scope.uid&&$scope.access_token)
+            $scope.getuserinfo($scope.uid);
+        else
+            $scope.isAuth = false;
+
         if(!localStorage.current_timeline_api)
             $scope.current_timeline_api = sinaApi.config.home_timeline;
         else
@@ -552,15 +607,38 @@ angular.module('myApp.controllers', [])
         $("li.active").removeClass("active");
         $(localStorage.current_icon).addClass("active");
 
+
+        $scope.hideImgPop = function(){
+            $scope.commentbox.pic = null;
+            $("#selectImgBtn").popover('hide');
+        };
+
+        $scope.hideEmoPop = function(){
+            $('#emotions_div').hide();
+            $("#showEmotionsBtn").popover('hide');
+        }
+
+
+
         setTimeout(function(){
             $("#warp")[0].scrollTop = chrome.extension.getBackgroundPage().scrollTop;
+            $("#selectImgBtn").popover({
+                placement : 'bottom', // top, bottom, left or right
+                html: 'true',
+                content : $('#uploadimg_div'),
+                trigger: 'manual'
+            });
             $("#showEmotionsBtn").popover({
                 placement : 'bottom', // top, bottom, left or right
                 html: 'true',
                 content : $('#emotions_div'),
                 trigger: 'manual'
             });
+            $scope.$apply();
+
         }, 200);
+
+
 		
         setInterval(function(){
             $scope.$apply($scope.unreadTimeLineNum = localStorage.unreadTimeLineNum);
@@ -570,6 +648,7 @@ angular.module('myApp.controllers', [])
 
      }
   ]);
+
 
 var Example = (function() {
     "use strict";

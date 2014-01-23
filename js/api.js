@@ -22,6 +22,8 @@ var sinaApi = {
         repost:'/statuses/repost.json',
         update:'/statuses/update.json',
         upload:'/statuses/upload.json',
-        revokeoauth2:'/oauth2/revokeoauth2'
+        revokeoauth2:'/oauth2/revokeoauth2',
+        add_favorites:'/favorites/create.json',
+        remove_favorites:'/favorites/destroy.json'
 	}
 };
