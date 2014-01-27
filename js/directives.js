@@ -26,16 +26,16 @@ angular.module('myApp.directives', []).
                 };
                 if(e.which==1){
                     if(e.srcElement.src.indexOf('thumbnail')>0){
-                        $(e.srcElement).attr("currentScrollTop",$("#warp").scrollTop()) ;
                         e.srcElement.src = e.srcElement.src.replace('thumbnail','bmiddle');
                         $(e.srcElement).next('img').show();
                         $(e.srcElement).bind('load',function(_e){
                             $(e.srcElement).next('img').hide();
                         })
                     }else if(e.srcElement.src.indexOf('bmiddle')>0){
-                        console.log($(e.srcElement).offset().top);
-                        console.log($("#warp").scrollTop());
-                        $("#warp").scrollTop($("#warp").scrollTop()+$(e.srcElement).offset().top-100);
+                        $(e.srcElement).bind('load',function(_e){
+                            if(e.srcElement.getBoundingClientRect().top<100)
+                                $("#warp").scrollTop($("#warp")[0].scrollTop + e.srcElement.getBoundingClientRect().top-100);
+                        })
                         e.srcElement.src = e.srcElement.src.replace('bmiddle','thumbnail');
                     };
 
@@ -65,7 +65,6 @@ angular.module('myApp.directives', []).
                 };
                 if(e.which==1){
                     if(e.srcElement.src.indexOf('square')>0){
-                        $(e.srcElement).attr("currentScrollTop",$("#warp").scrollTop()) ;
                         e.srcElement.src = e.srcElement.src.replace('square','bmiddle');
                         $(e.srcElement).next('img').show();
                         $(e.srcElement).bind('load',function(_e){
@@ -73,7 +72,8 @@ angular.module('myApp.directives', []).
                         })
                     }else if(e.srcElement.src.indexOf('bmiddle')>0){
                         $(e.srcElement).bind('load',function(_e){
-                            $("#warp").scrollTop($(e.srcElement).attr("currentScrollTop"));
+                            if(e.srcElement.getBoundingClientRect().top<100)
+                              $("#warp").scrollTop($("#warp")[0].scrollTop + e.srcElement.getBoundingClientRect().top-100);
                         })
                         e.srcElement.src = e.srcElement.src.replace('bmiddle','square');
                     };
@@ -108,6 +108,61 @@ angular.module('myApp.directives', []).
             });
         }
 
+    }).directive('commentrow',function(){
+        return{
+            restrict: "E",
+            templateUrl:'template/comment_row.html',
+            transclude:true,
+            scope: {
+                item: "=item",
+                showCommentText:"&showCommentText"
+            }
+        }
+    }).directive('commentpager',function(){
+        return{
+            restrict: "E",
+            scope: {
+                item: "=item",
+                next:"&next",
+                pre:"&pre",
+            },
+            transclude:true,
+            templateUrl:'template/comment_pager.html'
+        }
+    }).directive('actionbar',function(){
+        return{
+            restrict: "E",
+            templateUrl:'template/actionbar.html'
+        }
+    }).directive('actionbarrt',function(){
+        return{
+            restrict: "E",
+            templateUrl:'template/actionbar_rt.html',
+        }
+    }).directive('multipic',function(){
+        return{
+            restrict: "E",
+            templateUrl:'template/multi_pic.html',
+            transclude:true,
+            scope: {
+                item: "=item"
+            }
+        }
+    }).directive('singlepic',function(){
+        return{
+            restrict: "E",
+            templateUrl:'template/single_pic.html',
+            transclude:true,
+            scope: {
+                item: "=item"
+            }
+        }
+    }).directive('header',function(){
+        return{
+            restrict: "E",
+            templateUrl:'template/header.html',
+            transclude:true
+        }
     })
 //    .directive('userinfo',function(){
 //        return function(scope,element,attrs){

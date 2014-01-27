@@ -43,6 +43,30 @@ var getUnreadCount =function(){
             }else{
                 chrome.browserAction.setBadgeText({text:""});
             }
+            //data = unescape(h[1]);
+			if(!localStorage.unreadAtNum_local)
+				localStorage.unreadAtNum_local = localStorage.unreadAtNum;
+			if(localStorage.unreadAtNum_local!=localStorage.unreadAtNum&&localStorage.unreadAtNum!=0){
+				localStorage.unreadAtNum_local=localStorage.unreadAtNum
+				var notification = webkitNotifications.createNotification(
+					'icon_48.png',  //
+					' ',  //
+					'有'+localStorage.unreadAtNum+'条@你的信息'  //
+				);
+				notification.show();
+			}
+            if(!localStorage.unreadCommentNum)
+                localStorage.unreadCommentNum_local = localStorage.unreadCommentNum;
+            if(localStorage.unreadCommentNum_local!=localStorage.unreadCommentNum&&localStorage.unreadCommentNum!=0){
+                localStorage.unreadCommentNum_local=localStorage.unreadCommentNum
+                var notification = webkitNotifications.createNotification(
+                    'icon_48.png',  //
+                    ' ',  //
+                    '有'+localStorage.unreadCommentNum+'条新的评论'  //
+                );
+                notification.show();
+            }
+
         });
 };
 
@@ -79,7 +103,10 @@ $.getJSON(sinaApi.config.host+sinaApi.config.emotions+'?access_token='+localStor
         console.log(emotions_category);
     });
 
-
+Messenger.options = {
+    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
+    theme: 'flat'
+};
 localStorage.current_timeline_api = sinaApi.config.home_timeline;
 localStorage.current_icon = "#home_btn";
 setInterval(getUnreadCount, 5000);

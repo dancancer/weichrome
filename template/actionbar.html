@@ -1,0 +1,9 @@
+<div name="actionbar " ng-show="current_timeline_api!=api.comments_timeline" style="margin-right: 5px;clear:right;float: right;">
+    <a href="" ng-class="{'action':!item.favorited,'action-h':item.favorited}" ng-click="favorite(item)"><i><span class="glyphicon glyphicon-heart"></span></i></a>
+    <a href="" class="action"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
+    <a href="" class="action">({{item.attitudes_count}})</a>
+    <a href="" class="action" ng-click="showCommentText(item,'repost',$event)"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
+    <a href="" class="action" ng-click="showRepost(item,$index)">({{item.reposts_count}})</a>
+    <a href="" class="action" ng-click="showCommentText(item,'comment',$event)"><i><span class="glyphicon glyphicon-comment"></span></i></a>
+    <a href="" class="action" ng-click="showComments(item,$index)">({{item.comments_count}})</a>
+</div>

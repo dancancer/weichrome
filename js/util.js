@@ -35,24 +35,6 @@ function binaryToBlob(data){
     return buildBlob([buffer]);
 }
 
-function insertText(obj,str) {
-    debugger;
-    if (document.selection) {
-        var sel = document.selection.createRange();
-        sel.text = str;
-    } else if (typeof obj.selectionStart === 'number' && typeof obj.selectionEnd === 'number') {
-        var startPos = obj.selectionStart,
-            endPos = obj.selectionEnd,
-            cursorPos = startPos,
-            tmpStr = obj.value;
-        obj.value = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length);
-        cursorPos += str.length;
-        obj.selectionStart = obj.selectionEnd = cursorPos;
-    } else {
-        obj.value += str;
-    }
-}
-
 function bulidUploadParam (pic,data){
     pic = {file:pic};
     var auth_args = {
@@ -137,4 +119,32 @@ function buildExifStr(exif){
         return "Exif:["+exifStr+"]";
     else
         return "";
+}
+
+function getLength(str) {
+    var len = str.length;
+    var reLen = 0;
+    for (var i = 0; i < len; i++) {
+        if (str.charCodeAt(i) < 27 || str.charCodeAt(i) > 126) {
+            // 全角
+            reLen += 2;
+        } else {
+            reLen++;
+        }
+    }
+    return reLen;
+}
+
+var m = {
+    name: 'auth_callback',
+    url: window.location.href
+};
+
+
+if ( chrome.runtime && chrome.runtime.sendMessage ) {
+    chrome.runtime.sendMessage(m);
+} else if ( chrome.extension.sendMessage ) {
+    chrome.extension.sendMessage(m);
+} else if (chrome.extension.sendRequest) {
+    chrome.extension.sendRequest(m);
 }
