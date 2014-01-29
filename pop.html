@@ -30,6 +30,30 @@
                     <h3 class="popover-title" style="display: none;"></h3>
                     <div class="popover-content"></div>
                 </div>
+                <div class="panel panel-default" style="height: 150px;width:580px;display: block">
+                    <div class="panel-body">
+                        <div style="text-align: center;height: 120px;width: 120px;float:left;" >
+                            <img class="img-thumbnail" src="{{user[0].avatar_large}}">
+                        </div>
+                        <div style="float:left;position: relative;padding-top: 50px;padding-left: 10px;">
+                            <b ng-bind="user[0].name"></b>
+                            <ul class="list-inline list-unstyled">
+                                <li>粉丝</li>
+                                <li><a ng-bind="user[0].followers_count"></a></li>
+                                <li>微博</li>
+                                <li><a ng-bind="user[0].statuses_count"></a></li>
+                                <li>关注</li>
+                                <li><a ng-bind="user[0].friends_count"></a></li>
+                            </ul>
+                            <span ng-bind="user[0].description"></span>
+
+                        </div>
+                        <div style="float: right">
+                            <a>已关注</a>
+                            <a>+关注</a>
+                        </div>
+                    </div>
+                </div>
                 <div ng-repeat="item in timeline track by $index" class="bottom_line"
                  style="margin-top: 10px;width: 585px;">
                     <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
@@ -195,7 +219,7 @@
 <script src="lib/exif/binaryajax.js"></script>
 <script src="lib/bootstrap/bootstrap.js"></script>
 <script src="lib/emoji/emoji.js"></script>
-<script src="js/api.js"></script>
+<!--<script src="js/api.js"></script>-->
 <script src="js/app.js"></script>
 <script src="js/services.js"></script>
 <script src="js/controllers.js"></script>

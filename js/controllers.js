@@ -84,7 +84,7 @@ angular.module('myApp.controllers', [])
             $scope.getuserinfo($scope.uid);
         }
   }])
-  .controller('weiboCtrl', ['$scope','$http',function($scope,$http) {
+  .controller('weiboCtrl', ['$scope','$http','sinaApi',function($scope,$http,sinaApi) {
 
         $scope.oAuthPath = 'https://api.weibo.com/oauth2/authorize?client_id='+sinaApi.config.oauth_key+'&redirect_uri=https://api.weibo.com/oauth2/default.html&response_type=code';
 
@@ -138,6 +138,7 @@ angular.module('myApp.controllers', [])
             var param = '?access_token='+$scope.access_token+'&uid='+$scope.uid;
             $http({method:'GET', url: sinaApi.config.host+sinaApi.config.user_show+param}).
               success(function(data, status) {
+                console.log(data);
                 $scope.user = [];
                 $scope.user.push(data);
                 $scope.isAuth = true;
@@ -146,7 +147,6 @@ angular.module('myApp.controllers', [])
                 console.log('getuserinfo');
               }).
               error(function(data, status) {
-                    debugger;
                 $scope.isAuth = false;
                 $("#oAuthIframe").attr("src",$scope.oAuthPath);
                 $scope.data = data || "Request failed";
@@ -687,7 +687,7 @@ angular.module('myApp.controllers', [])
             $scope.unreadAtNum = 0;
             $scope.appid = "";
             $scope.oAuthPath = "";
-            $scope.user=[];
+//            $scope.user=[];
             $scope.maxid=null;
             $scope.isloading = false;
             $scope.isAuth = true;

@@ -25,6 +25,8 @@ var sinaApi = {
         revokeoauth2:'/oauth2/revokeoauth2',
         add_favorites:'/favorites/create.json',
         remove_favorites:'/favorites/destroy.json',
-        reply:'/comments/reply.json'
+        reply:'/comments/reply.json',
+        friendships_create:"/friendships/create.json",
+        friendships_destroy:"/friendships/destroy.json",
 	}
 };
