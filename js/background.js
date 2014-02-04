@@ -11,6 +11,39 @@ var timeline = new Array();
 var emotions= new Array();
 var orig_emotions = [];
 var emotions_category = [];
+
+var sinaApi = {};
+sinaApi.access_token = localStorage.access_token;
+sinaApi.uid = localStorage.uid;
+sinaApi.config = {
+    source : '3962237458',
+    oauth_key : '3962237458',
+    oauth_secret : 'bc289a46f3f0af639194383ac884d784',
+    google_appkey : 'pnkacoeejlfoikeaiobjennblgpoaaao',
+    oauth_callback:'https://api.weibo.com/oauth2/default.html',
+    host : 'https://api.weibo.com/2',
+    get_uid : '/account/get_uid.json',
+    user_show:'/users/show.json',
+    home_timeline:'/statuses/home_timeline.json',
+    comments_timeline:'/comments/timeline.json',
+    mentions_timeline:'/statuses/mentions.json',
+    get_comments:'/comments/show.json',
+    post_comments:'/comments/create.json',
+    repost_timeline:'/statuses/repost_timeline.json',
+    friends:'/friendships/friends.json',
+    favorites:'/favorites.json',
+    emotions:'/emotions.json',
+    repost:'/statuses/repost.json',
+    update:'/statuses/update.json',
+    upload:'/statuses/upload.json',
+    revokeoauth2:'/oauth2/revokeoauth2',
+    add_favorites:'/favorites/create.json',
+    remove_favorites:'/favorites/destroy.json',
+    reply:'/comments/reply.json',
+    friendships_create:"/friendships/create.json",
+    friendships_destroy:"/friendships/destroy.json",
+};
+
 var uniq = function (arr) {
     if (arr && arr.length >= 1) {
         var a = [], o = {}, i, v, len = arr.length;
@@ -103,10 +136,6 @@ $.getJSON(sinaApi.config.host+sinaApi.config.emotions+'?access_token='+localStor
         console.log(emotions_category);
     });
 
-Messenger.options = {
-    extraClasses: 'messenger-fixed messenger-on-bottom messenger-on-right',
-    theme: 'flat'
-};
 localStorage.current_timeline_api = sinaApi.config.home_timeline;
 localStorage.current_icon = "#home_btn";
 setInterval(getUnreadCount, 5000);

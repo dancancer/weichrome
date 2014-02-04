@@ -1,8 +1,6 @@
 'use strict';
 
 /* Directives */
-
-
 angular.module('myApp.directives', []).
   directive('appVersion', ['version', function(version) {
     return function(scope, elm, attrs) {
@@ -110,11 +108,11 @@ angular.module('myApp.directives', []).
 
     }).directive('commentrow',function(){
         return{
-            restrict: "E",
+            restrict: "A",
             templateUrl:'template/comment_row.html',
             transclude:true,
             scope: {
-                item: "=item",
+                comment: "=comment",
                 showCommentText:"&showCommentText"
             }
         }
@@ -124,7 +122,7 @@ angular.module('myApp.directives', []).
             scope: {
                 item: "=item",
                 next:"&next",
-                pre:"&pre",
+                pre:"&pre"
             },
             transclude:true,
             templateUrl:'template/comment_pager.html'
@@ -162,6 +160,18 @@ angular.module('myApp.directives', []).
             restrict: "E",
             templateUrl:'template/header.html',
             transclude:true
+        }
+    }).directive('onFinishRender', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attr) {
+                if (scope.$last === true) {
+                    console.log('===================');
+                    $timeout(function () {
+                        scope.$emit('ngRepeatFinished');
+                    },100);
+                }
+            }
         }
     })
 //    .directive('userinfo',function(){

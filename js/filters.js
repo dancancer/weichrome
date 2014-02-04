@@ -55,7 +55,8 @@ angular.module('myApp.filters', []).
                 });
                 //替换@
                 for (var i in list) {
-                    var s = "<a  href='http://weibo.com/n/" + list[i].substr(1, list[i].length) + "' rclicka  title='右键打开主页'>" + list[i] + "</a>";
+                    var screenname = list[i].substr(1, list[i].length);
+                    var s = "<a  href='http://weibo.com/n/" + screenname + "' ng-click=\"loadUser('"+screenname+"')\" rclicka  title='右键打开主页'>" + list[i] + "</a>";
                     var reg = new RegExp(list[i], "g")
                     text = text.replace(reg, s);
                 }

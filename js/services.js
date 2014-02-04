@@ -21,6 +21,7 @@ angular.module('myApp.services', [])
             host : 'https://api.weibo.com/2',
             get_uid : '/account/get_uid.json',
             user_show:'/users/show.json',
+            user_timeline:'/statuses/user_timeline.json',
             home_timeline:'/statuses/home_timeline.json',
             comments_timeline:'/comments/timeline.json',
             mentions_timeline:'/statuses/mentions.json',
@@ -95,8 +96,14 @@ angular.module('myApp.services', [])
             sinaApi._get(url,suc,err);
         };
 
-        sinaApi.user_show = function(uid,suc,err){
+        sinaApi.user_show_byid = function(uid,suc,err){
             var param = '?access_token='+sinaApi.access_token+'&uid='+uid;
+            var url = sinaApi.config.host+sinaApi.config.user_show+param;
+            sinaApi._get(url,suc,err);
+        };
+
+        sinaApi.user_show = function(screen_name,suc,err){
+            var param = '?access_token='+sinaApi.access_token+'&screen_name='+screen_name;
             var url = sinaApi.config.host+sinaApi.config.user_show+param;
             sinaApi._get(url,suc,err);
         };
@@ -104,7 +111,7 @@ angular.module('myApp.services', [])
         sinaApi.mentions_timeline = function(maxid,suc,err){
             var url =  sinaApi.config.host+sinaApi.config.mentions_timeline+'?access_token='+sinaApi.access_token;
             if(maxid!=null){
-                url = url+"&max_id="+sinaApi.maxid;
+                url = url+"&max_id="+maxid;
             }
             sinaApi._get(url,suc,err);
         }
@@ -112,7 +119,7 @@ angular.module('myApp.services', [])
         sinaApi.comments_timeline = function(maxid,suc,err){
             var url =  sinaApi.config.host+sinaApi.config.comments_timeline+'?access_token='+sinaApi.access_token;
             if(maxid!=null){
-                url = url+"&max_id="+sinaApi.maxid;
+                url = url+"&max_id="+maxid;
             }
             sinaApi._get(url,suc,err);
         }
@@ -120,7 +127,7 @@ angular.module('myApp.services', [])
         sinaApi.favorites = function(maxid,suc,err){
             var url =  sinaApi.config.host+sinaApi.config.favorites+'?access_token='+sinaApi.access_token;
             if(maxid!=null){
-                url = url+"&max_id="+sinaApi.maxid;
+                url = url+"&max_id="+maxid;
             }
             sinaApi._get(url,suc,err);
         }
@@ -128,7 +135,7 @@ angular.module('myApp.services', [])
         sinaApi.favorites = function(maxid,suc,err){
             var url =  sinaApi.config.host+sinaApi.config.favorites+'?access_token='+sinaApi.access_token;
             if(maxid!=null){
-                url = url+"&max_id="+sinaApi.maxid;
+                url = url+"&max_id="+maxid;
             }
             sinaApi._get(url,suc,err);
         }
@@ -136,7 +143,15 @@ angular.module('myApp.services', [])
         sinaApi.home_timeline = function(maxid,suc,err){
             var url =  sinaApi.config.host+sinaApi.config.home_timeline+'?access_token='+sinaApi.access_token;
             if(maxid!=null){
-                url = url+"&max_id="+sinaApi.maxid;
+                url = url+"&max_id="+maxid;
+            }
+            sinaApi._get(url,suc,err);
+        }
+
+        sinaApi.user_timeline = function(screen_name,maxid,suc,err){
+            var url =  sinaApi.config.host+sinaApi.config.user_timeline+'?screen_name='+screen_name+'&access_token='+sinaApi.access_token;
+            if(maxid!=null){
+                url = url+"&max_id="+maxid;
             }
             sinaApi._get(url,suc,err);
         }
@@ -218,9 +233,9 @@ angular.module('myApp.services', [])
         }
 
 
-        sinaApi.favorite = function(id,is_favorited,err){
+        sinaApi.favorite = function(id,is_favorited,suc,err){
             var url= sinaApi.config.host+sinaApi.config.add_favorites;
-            var _data = '&id='+item.id+'&access_token='+$scope.access_token;
+            var _data = '&id='+id+'&access_token='+$scope.access_token;
             if(is_favorited)
                 url = sinaApi.config.host+sinaApi.config.remove_favorites;
             sinaApi._post(url,_data,suc,err);

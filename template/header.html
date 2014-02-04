@@ -1,38 +1,39 @@
-<div id="header" class="shadow .navbar-default  navbar-collapse"  style="background-color: rgba(248,248,248,1);width: 100%;margin-left: -10px;margin-right: 5px; height: 58px;z-index: 1000000000000;position: fixed;top: 0;" >
+<div id="header" class="shadow .navbar-default  navbar-collapse"  style="background-color: rgba(248,248,248,1);
+    width: 100%;z-index: 1000000000000;position: absolute;float: left;left:0;top: 0;" >
     <ul class="nav navbar-nav" style="margin: 0px;overflow: hidden">
         <li style="float: left" ng-repeat="_user in currentuser">
-            <img title="{{_user.name}}" class="img-polaroid" src="{{_user.avatar_large}}" style="margin-top:3px;width: 50px; height: 50px;" alt="">
+            <img title="{{_user.name}}" class="img-polaroid" ng-src="{{_user.avatar_large}}" style="margin-top:2px;width: 50px; height: 50px;" alt="">
         </li>
-        <li style="float: left" id="home_btn" class="active" ng-click="refresh()">
-            <a href="" style="margin-top:2px ">
+        <li style="float: left" ng-click="loadHome()">
+            <a href="" class="active" id="home_btn" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-home">
-                                <span style="font-size: 10px" ng-bind="unreadTimeLineNum"  ng-show="unreadTimeLineNum>0" class="nav-counter nav-counter-green"></span>
+                                <span style="z-index: 999;font-size: 10px" ng-bind="unreadTimeLineNum"  ng-show="unreadTimeLineNum>0" class="nav-counter nav-counter-green"></span>
                             </span>
             </a>
         </li>
-        <li style="float: left" id="at_btn" ng-click="loadAt()">
-            <a href="" style="margin-top:2px;width: 56px;height: 50px">
+        <li style="float: left" ng-click="loadAt()">
+            <a href="" id="at_btn" style="margin-top:2px;width: 56px;height: 50px">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 34px" >
-                                <div style="margin-top: -8px;margin-left: -5px;font-weight: bolder;">@</div>
-                                <span style="font-size: 10px;margin-top: 1px;margin-right: 15px" class="nav-counter nav-counter-green" ng-bind="unreadAtNum" ng-show="unreadAtNum>0"></span>
+                                <div style="margin-top: -24px;margin-left: -5px;font-weight: bolder;">@</div>
+                                <span style="z-index: 999;font-size: 10px;margin-top: 1px;margin-right: 15px" class="nav-counter nav-counter-green" ng-bind="unreadAtNum" ng-show="unreadAtNum>0"></span>
                             </span>
             </a>
         </li>
-        <li style="float: left" id="comment_btn" ng-click="loadComment()">
-            <a href="" style="margin-top:2px ">
+        <li style="float: left" ng-click="loadComment()">
+            <a href="" id="comment_btn" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-comment">
-                                <span style="font-size: 10px" class="nav-counter nav-counter-green" ng-bind="unreadCommentNum" ng-show="unreadCommentNum>0"></span>
+                                <span style="z-index: 999;font-size: 10px" class="nav-counter nav-counter-green" ng-bind="unreadCommentNum" ng-show="unreadCommentNum>0"></span>
                             </span>
             </a>
         </li>
-        <li style="float: left" id="favorite_btn">
-            <a href="" style="margin-top:2px " ng-click="loadFavorites()">
+        <li style="float: left" >
+            <a href="" id="favorite_btn" style="margin-top:2px " ng-click="loadFavorites()">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-heart">
                             </span>
             </a>
         </li>
-        <li style="float: left;display: none;" id="userinfo_btn">
-            <a href="" style="margin-top:2px ">
+        <li style="float: left;display: block;" ng-click="loadUser()">
+            <a href="" id="user_btn" style="margin-top:2px ">
                             <span style="margin-bottom:2px;margin-left: -2px; font-size: 28px" class="glyphicon glyphicon-user">
                             </span>
             </a>

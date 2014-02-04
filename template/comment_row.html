@@ -1,10 +1,8 @@
-<div class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
-     ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
-     ng-repeat="comment in item.comments" ng-animate="'animate'">
+
     <div style="float: left;width: 10%">
         <a href="http://www.weibo.com/{{comment.user.profile_url}}" rclicka>
             <div class="avatar">
-                <img style="width: 40px" class="img-circle" src="{{comment.user.profile_image_url}}"/>
+                <img style="width: 40px" class="img-circle" ng-src="{{comment.user.profile_image_url}}"/>
             </div>
         </a>
     </div>
@@ -13,9 +11,8 @@
             <b>{{comment.user.name}}:</b>
         </a>
         <span compile="comment.text|weibotxt"></span>
-        <a ng-show="comment.show" href="" style="float:right;margin-right: -17px;" class="action"
+        <a ng-if="comment.show" href="" style="float:right;margin-right: -17px;" class="action"
            ng-click="showCommentText(comment,'reply',$event)">
             <i><span class="glyphicon glyphicon-comment"></span></i>
         </a>
     </div>
-</div>

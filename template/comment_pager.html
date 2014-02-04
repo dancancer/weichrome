@@ -1,10 +1,10 @@
 
-    <div style="float: left" ng-show="item.comments_pre_page>0">
+    <div style="float: left" ng-if="item.comments_pre_page>0">
         <a href="" style="font-size: 13px" ng-click="pre()">
             <span class="glyphicon glyphicon-circle-arrow-left"></span>
         </a>
     </div>
-    <div style="float: right" ng-show="item.comments_next_page>0">
+    <div style="float: right" ng-if="item.comments_next_page>0">
         <a href="" style="font-size: 13px" ng-click="next()">
             <span class="glyphicon glyphicon-circle-arrow-right"></span>
         </a>

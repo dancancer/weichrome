@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="en" ng-app="myApp" xmlns="http://www.w3.org/1999/html" style="overflow: hidden;height: 590px">
 <head>
     <meta charset="utf-8">
@@ -11,69 +12,71 @@
         .head{height: 50px;}
     </style>
 </head>
-<body  style="overflow:hidden;background-image: url(/img/content_inner_bg.png);height: 590px;
-    text-shadow: 0 1px 0 #FFFFFF;background: rgba(248,248,248,1);font-family: '微软雅黑'" >
+<body  style="overflow:hidden;height: 590px;
+    text-shadow: 0 1px 0 #FFFFFF;background: rgba(242,242,242,1);font-family: '微软雅黑'" >
 <div id = "a1" ng-controller="weiboCtrl"  style="z-index: 1;overflow: hidden;height:100%;">
-    <div class="tab-content" ng-show="!isAuth">
+    <div class="tab-content" ng-if="!isAuth">
         <h2>请先进行登录授权。</h2>
         <div style="text-align: center">
             <iframe id="oAuthIframe"    src="" style="width: 600px;height: 600px;border: none" ></iframe>
         </div>
 
     </div>
-    <div id="tab-content" class="tab-content" ng-show="isAuth" style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
+    <div id="tab-content" class="tab-content" ng-if="isAuth" style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
         <div style="width: 600px;padding-left: 10px;position: relative;overflow: hidden" >
             <header></header>
-            <div id="warp"style="margin-top: 55px;height:535px;overflow-y:auto;overflow-x: hidden;">
-                <div id="infodiv" class="popover right fade in" ng-click="hideinfo()" style="position: absolute">
-                    <div class="arrow"></div>
-                    <h3 class="popover-title" style="display: none;"></h3>
-                    <div class="popover-content"></div>
-                </div>
-                <div class="panel panel-default" style="height: 150px;width:580px;display: block">
+            <div id="infodiv" class="popover right fade in" ng-click="hideinfo()" style="position: absolute">
+                <div class="arrow"></div>
+                <h3 class="popover-title" style="display: none;"></h3>
+                <div class="popover-content"></div>
+            </div>
+            <div id="warp" ng-if="showMain" style="margin-top: 55px;height:535px;overflow-y:auto;overflow-x: hidden;" bindonce  >
+                <div ng-if="current_tab==tabs.user" class="panel panel-default" style="height: 150px;width:580px;display: block">
                     <div class="panel-body">
-                        <div style="text-align: center;height: 120px;width: 120px;float:left;" >
-                            <img class="img-thumbnail" src="{{user[0].avatar_large}}">
+                        <div style="text-align: center;height: 120px;width: 120px;float:left;margin-right: 10px;" >
+                            <img class="img-thumbnail" ng-src="{{target_user.avatar_large}}">
                         </div>
-                        <div style="float:left;position: relative;padding-top: 50px;padding-left: 10px;">
-                            <b ng-bind="user[0].name"></b>
+                        <div style="position: relative;padding-top: 10px;">
+                            <b ng-bind="target_user.name"></b>
                             <ul class="list-inline list-unstyled">
                                 <li>粉丝</li>
-                                <li><a ng-bind="user[0].followers_count"></a></li>
+                                <li><a ng-bind="target_user.followers_count"></a></li>
                                 <li>微博</li>
-                                <li><a ng-bind="user[0].statuses_count"></a></li>
+                                <li><a ng-bind="target_user.statuses_count"></a></li>
                                 <li>关注</li>
-                                <li><a ng-bind="user[0].friends_count"></a></li>
+                                <li><a ng-bind="target_user.friends_count"></a></li>
                             </ul>
-                            <span ng-bind="user[0].description"></span>
+                            <span ng-bind="target_user.description"></span>
+                            <div style="float: right;position: absolute;top: 10px;left: 480px;">
+                                <a ng-if="target_user.following">已关注</a>
+                                <a ng-if="!target_user.following">+关注</a>
+                            </div>
+                        </div>
 
-                        </div>
-                        <div style="float: right">
-                            <a>已关注</a>
-                            <a>+关注</a>
-                        </div>
                     </div>
                 </div>
-                <div ng-repeat="item in timeline track by $index" class="bottom_line"
+                <div  id="repeatContent" on-finish-render ng-repeat="item in timeline track by item.id" class="bottom_line"
                  style="margin-top: 10px;width: 585px;">
                     <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
                         <div name="avatar" style="width: 60px;float: left">
-                            <a href="http://www.weibo.com/{{item.user.profile_url}}" rclicka>
-                                <img userinfo src="{{item.user.avatar_large}}" style="width: 60px; height: 60px;" alt="" class="img-rounded">
+                            <a ng-href="http://www.weibo.com/{{item.user.profile_url}}" ng-click="loadUser(item.user.screen_name)" rclicka>
+                                <img userinfo ng-src="{{item.user.avatar_large}}" style="width: 60px; height: 60px;" alt="" class="img-rounded">
                             </a>
                         </div>
                         <div name="name&text" style=";float: left;padding: 2px;margin-left:10px;margin-bottom: 10px;min-height: 60px;width: 510px;">
-                            <a href="http://www.weibo.com/{{item.user.profile_url}}" rclicka>
+                            <a ng-href="http://www.weibo.com/{{item.user.profile_url}}"
+                               ng-click="loadUser(item.user.screen_name)" rclicka>
                                 <b>{{item.user.name}}:</b>
                             </a>
                             <br>
                             <span compile="item.text|weibotxt"></span>
                         </div>
 
-                        <div name="retweetedContant" style="margin-top: -5px;position: relative;float: left;" ng-show="item.retweeted_status">
+                        <div name="retweetedContant" style="margin-top: -5px;position: relative;float: left;" ng-if="item.retweeted_status">
                             <div class="highlight arrow_box " style="text-shadow: 0 1px 0 #F9F9F9;margin-left: 70px;padding: 10px;
                                 margin-bottom: 10px;min-height: 40px;width: 510px;position: relative">
-                                <a href="http://www.weibo.com/{{item.retweeted_status.user.profile_url}}" rclicka>
+                                <a ng-href="http://www.weibo.com/{{item.retweeted_status.user.profile_url}}"
+                                   ng-click="loadUser(item.retweeted_status.user.screen_name)" rclicka>
                                     <b>@{{item.retweeted_status.user.name}}:</b>
                                 </a>
                                 <br>
@@ -87,12 +90,16 @@
                                 <div style="margin-bottom: 14px">
                                     <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;">{{(item.retweeted_status.created_at)|mydate}} 来自</div>
                                     <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;" compile="item.retweeted_status.source"></div>
-                                <actionbarrt></actionbarrt>
+                                <actionbarrt ng-if="current_tab != tabs.comments"></actionbarrt>
                                 </div>
                                 <div id="recommentsdiv{{$index}}" class="panel-collapse collapse" style="width:100%;padding: 5px">
-                                    <commentrow item="item.retweeted_status" show-comment-text="showCommentText()"></commentrow>
-                                    <commentpager item="item.retweeted_status" pre="getcomments(item.retweeted_status,'pre')"
-                                                  next="getcomments(item.retweeted_status,'next')"></commentpager>
+                                    <div commentrow class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
+                                         ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
+                                         show-comment-text="showCommentText(comment,'reply',$event)" comment="comment"
+                                         ng-repeat="comment in item.retweeted_status.comments" >
+                                    </div>
+                                    <commentpager item="item.retweeted_status" pre="get_comments(item.retweeted_status,'pre')"
+                                                  next="get_comments(item.retweeted_status,'next')"></commentpager>
                                 </div>
                             </div>
                         </div>
@@ -104,16 +111,20 @@
                             <div class="action" style="float: left;font-size: 12px;margin-top: 2px;">{{(item.created_at)|mydate}} 来自</div>
                             <div class="action" style="float: left;font-size: 12px;margin-top: 2px;" compile="item.source"></div>
                         </div>
-                        <actionbar ></actionbar>
-                        <div name="reply_actionbar " ng-show="current_timeline_api==api.comments_timeline" style="margin-right: 5px;clear:right;float: right;">
+                        <actionbar ng-if="current_tab != tabs.comments"></actionbar>
+                        <div name="reply_actionbar " ng-if="current_tab == tabs.comments" style="margin-right: 5px;clear:right;float: right;">
                             <a href="" class="action" ng-click="showCommentText(item,'reply',$event)">
                                 <i><span class="glyphicon glyphicon-comment"></span></i>
                             </a>
                         </div>
                         <div id="commentsdiv{{$index}}" class="panel-collapse collapse"
                              style="width:85%;margin-left: 70px; margin-right:5px;padding: 5px;position: relative;float: left;">
-                            <commentrow item="item" show-comment-text="showCommentText()"></commentrow>
-                            <commentpager item="item" pre="getcomments(item,'pre')" next="getcomments(item,'next')"></commentpager>
+                            <div commentrow class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
+                                 ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
+                                 show-comment-text="showCommentText(comment,'reply',$event)" comment="comment"
+                                 ng-repeat="comment in item.comments" >
+                            </div>
+                            <commentpager item="item" pre="get_comments(item,'pre')" next="get_comments(item,'next')"></commentpager>
                         </div>
                     </div>
                     <div  class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
@@ -154,7 +165,7 @@
 
             <div style="float: right;margin-top: 5px;">
                 <button class="btn btn-default" style="margin-top: 5px;" ng-click="hideCommentText()" type="button">取消</button>
-                <button class="btn btn-primary" style="margin-top: 5px;" ng-click="comment()" type="button">{{commentbox.button_txt}}</button>
+                <button class="btn btn-primary" style="margin-top: 5px;" ng-click="send()" type="button">{{commentbox.button_txt}}</button>
             </div>
             <br>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="display: none">
@@ -199,7 +210,7 @@
             <ul class="list-unstyled list-inline" style="display: block;float: left">
                 <li style="padding: 2px;min-width: 20px;" ng-repeat="emotion in emotions|filter:current_category">
                     <a href="" style="position: relative;display: inline-block;" ng-click="insertEmotion(emotion.phrase)">
-                        <img src="{{emotion.url}}">
+                        <img ng-src="{{emotion.url}}">
                     </a>
                 </li>
             </ul>
@@ -210,18 +221,16 @@
 
 </body>
 
-<!-- In production use:
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
--->
 <script src="lib/angular/angular.min.js"></script>
 <script src="lib/jquery/jquery.min.js"></script>
 <script src="lib/exif/exif.js"></script>
 <script src="lib/exif/binaryajax.js"></script>
 <script src="lib/bootstrap/bootstrap.js"></script>
 <script src="lib/emoji/emoji.js"></script>
-<!--<script src="js/api.js"></script>-->
 <script src="js/app.js"></script>
 <script src="js/services.js"></script>
+<script src="js/bindonce.min.js"></script>
+<!--<script src="js/code.min.js"></script>-->
 <script src="js/controllers.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>

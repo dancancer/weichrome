@@ -1,3 +1,7 @@
+.nav > li >a.active {
+    text-decoration: none;
+    background-color: #eeeeee;
+}
 .shadow{
     -webkit-box-shadow:  0 3px 3px rgba(0, 0, 0, 0.2);
     -moz-box-shadow:  0 3px 3px rgba(0, 0, 0, 0.2);
@@ -6,8 +10,8 @@
 
 .arrow_box {
     position: relative;
-    background: #e4e4e4;
-    border: 1px solid #d4d4d4;
+    background: #DDDDDD;
+    border: 1px solid #CCCCCC;
 }
 .arrow_box:after, .arrow_box:before {
     -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -26,8 +30,8 @@
     -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    border-color: rgba(245, 245, 245, 0);
-    border-bottom-color: #e4e4e4;
+    border-color: rgba(204, 204, 204, 0);
+    border-bottom-color: #DDDDDD;
     border-width: 5px;
     left: 10%;
     margin-left: -5px;
@@ -36,14 +40,14 @@
     -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    border-color: rgba(227, 227, 227, 0);
-    border-bottom-color: #d4d4d4;
+    border-color: rgba(204, 204, 204, 0);
+    border-bottom-color: #CCCCCC;
     border-width: 6px;
     left: 10%;
     margin-left: -6px;
 }
 .bottom_line{
-    border-bottom-color: rgb(230, 230, 230);
+    border-bottom-color: rgb(221, 221, 221);
     border-bottom-style: solid;
     border-bottom-width: 1px;
 }
