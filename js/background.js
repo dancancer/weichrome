@@ -44,6 +44,7 @@ sinaApi.config = {
     friendships_destroy:"/friendships/destroy.json",
 };
 
+
 var uniq = function (arr) {
     if (arr && arr.length >= 1) {
         var a = [], o = {}, i, v, len = arr.length;

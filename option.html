@@ -1,27 +1,74 @@
 <!doctype html>
-<html lang="en" ng-app="myApp" xmlns="http://www.w3.org/1999/html">
+<html lang="en" ng-app="myApp" xmlns="http://www.w3.org/1999/html" style="height: 100%;">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>授权配置</title>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.css"/>
+    <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css"/>
     <link rel="stylesheet" href="css/myweibo.css"/>
 </head>
-<body style="text-shadow: 0 1px 0 #FFFFFF;background: #f5f5f5;">
-<div ng-controller="optionCtrl" style="padding: 10px">
-    <button type="button" class="btn btn-default" ng-click="authorize()">授权</button>
-    <button type="button" class="btn btn-default" ng-click="revokeoauth2()">取消授权</button>
+<body style="text-shadow: 0 1px 0 #FFFFFF;background: #f5f5f5;height: 100%;">
 
-    <ul  class="list-unstyled">
-        <li ng-repeat="_user in user">
-            <p>{{_user.name}}</p>
-            <img ng-src="{{_user.avatar_large}}" style="width: 100px; height: 100px;" alt="" class="img-thumbnail">
-        </li>
-    </ul>
+
+<div ng-controller="optionCtrl" style="min-height: 100%;">
+
+
+    <nav class="navbar navbar-inverse" role="navigation" style="text-shadow: none;border-radius: 0px;">
+        <div class="container">
+            <div class="navbar-header">
+                <div class="" style="margin-top: 13px">
+                    <img src="icon_48.png" style="width: 24px;height: 24px">
+                    <b class="media-heading" style="font-size: 16px;vertical-align: bottom;color: #777">Weikr 设置</b>
+                </div>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="mailto:weikr.app@gmail.com?Subject=问题反馈">问题反馈</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+        <div class="container">
+            <a class="btn btn-primary" href="#" role="button"  ng-show="user.length<=0" ng-click="authorize()" style="text-shadow: none;"><i class="fa fa-plus" style="margin-right: 5px;"></i>添加授权</a>
+            <ul  class="list-unstyled">
+                <li ng-repeat="_user in user">
+                    <img ng-src="{{_user.avatar_large}}" style="width: 50px; height: 50px;" alt="" class="img-thumbnail">
+                    <label>{{_user.name}}</label>
+
+                    <button type="button" class="btn btn-default" ng-show="user.length>0" ng-click="authorize()">重新授权</button>
+                    <button type="button" class="btn btn-default" ng-click="revokeoauth2()">取消授权</button>
+
+
+
+                </li>
+            </ul>
+        </div>
+
+</div>
+<div role="footer" style="position: relative;text-align: center;background-color: #DDDDDD;text-shadow:none;
+	margin-top: -100px; /* negative value of footer height */
+	height: 100px;
+	clear:both;">
+    <div style="padding-top: 50px">
+    <a href="http://www.weibo.com/weikrapp">WeiKr</a> ©2014
+    Powered by
+    <a href="https://www.angularjs.org">Angularjs </a>
+    <a href="http://jquery.com/">jQuery </a>
+    <a href="http://getbootstrap.com/">Bootstrap </a>
+    <a href="http://fontawesome.io">Font Awesome </a>
+    <a href="http://mindmup.github.io/bootstrap-wysiwyg/">bootstrap-wysiwyg</a>
+    <a href="http://html2canvas.hertzen.com">html2canvas</a>
+    <a href="http://www.nihilogic.dk/labs/canvas2image/">Canvas2Image</a>
+        </div>
+
 </div>
 
 <script src="lib/angular/angular.min.js"></script>
-<script src="lib/jquery/jquery.min.js"></script>
+<script src="lib/jquery/jquery-2.1.1.min.js"></script>
 <script src="lib/bootstrap/bootstrap.js"></script>
 <script src="js/app.js"></script>
 <script src="js/services.js"></script>

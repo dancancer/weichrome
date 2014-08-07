@@ -34,7 +34,6 @@ angular.module('myApp.services', [])
             repost:'/statuses/repost.json',
             update:'/statuses/update.json',
             upload:'/statuses/upload.json',
-            revokeoauth2:'/oauth2/revokeoauth2',
             add_favorites:'/favorites/create.json',
             remove_favorites:'/favorites/destroy.json',
             reply:'/comments/reply.json',
@@ -176,8 +175,8 @@ angular.module('myApp.services', [])
         }
 
         sinaApi.upload = function(text,pic,suc,err){
-            var _data = bulidUploadParam($scope.commentbox.pic,{
-                'status':encodeURI($scope.commentbox.comment_txt),
+            var _data = bulidUploadParam(pic,{
+                'status':encodeURI(text),
                 'access_token':sinaApi.access_token
             });
             var url= sinaApi.config.host+sinaApi.config.upload;
@@ -235,7 +234,7 @@ angular.module('myApp.services', [])
 
         sinaApi.favorite = function(id,is_favorited,suc,err){
             var url= sinaApi.config.host+sinaApi.config.add_favorites;
-            var _data = '&id='+id+'&access_token='+$scope.access_token;
+            var _data = '&id='+id+'&access_token='+sinaApi.access_token;
             if(is_favorited)
                 url = sinaApi.config.host+sinaApi.config.remove_favorites;
             sinaApi._post(url,_data,suc,err);

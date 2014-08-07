@@ -1,3 +1,6 @@
+.longweibo{
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.125);
+}
 .nav > li >a.active {
     text-decoration: none;
     background-color: #eeeeee;
@@ -45,6 +48,18 @@
     border-width: 6px;
     left: 10%;
     margin-left: -6px;
+}
+
+.top_line{
+    position: absolute;
+    bottom: 0;
+    width: 670px;
+    padding: 15px;
+    margin: 10px;
+    border-top-color: rgb(221, 221, 221);
+    border-top-style: solid;
+    border-top-width: 1px;
+    text-align: right;
 }
 .bottom_line{
     border-bottom-color: rgb(221, 221, 221);
@@ -314,7 +329,7 @@ body::-webkit-scrollbar{
     font-size: 8px;
     font-family: Helvetica;
     position: absolute;
-    top: -4px;
+    top: -3px;
     right: -20px;
     min-width: 8px;
     height: 16px;

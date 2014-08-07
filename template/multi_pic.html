@@ -1,9 +1,9 @@
 <div name="multi_pic_contant" style=" margin-left: 0px;"  ng-show="item.pic_urls.length>1">
     <div style="padding: 0px;max-width: 350px">
         <ul class="list-unstyled list-inline" style="margin-bottom: 0px">
-            <li style="padding: 2px;min-width: 80px;" ng-repeat="pic in item.pic_urls">
+            <li style="padding: 2px;" ng-repeat="pic in item.pic_urls">
                 <a href="" style="position: relative;display: inline-block;">
-                    <img rclicks ng-src="{{pic.thumbnail_pic|square}}" class="img-polaroid" title="右键新标签打开原图"  >
+                    <img rclicks ng-src="{{pic.thumbnail_pic|square}}" class="img-polaroid" style="min-width: 90px;min-height: 90px;" title="右键新标签打开原图"  >
                     <img src="/img/loading.gif" class="img_loading" >
                 </a>
             </li>

@@ -20,14 +20,33 @@ angular.module('myApp.controllers', [])
 
             window.open($scope.oAuthPath);
         };
+
+        $scope.newWindow = function(){
+            function _get_open_window_args(width, height) {
+                width = 520;
+                height = 600;
+                var left = (window.screen.availWidth - width) / 2;
+                var win_args = {width: width, height: height, left: left, top: 30, toolbar: 'no', menubar: 'no', location: 'no', resizable: 'no', scrollbars: 'yes', status: 'yes'};
+                var args_str = '';
+                for (var k in win_args) {
+                    args_str += k + '=' + win_args[k] + ',';
+                }
+                return args_str.substring(0, args_str.length - 1);
+            }
+            var url = 'longtxt.html';
+            chrome.tabs.create({"url":url,"selected":true}, function(tab){
+            });
+//            window.open(url, '_blank', _get_open_window_args(600,600));
+        }
         $scope.revokeoauth2 = function(){
             var param = '?access_token='+$scope.access_token;
-            $http({method:'GET', url: sinaApi.config.host+sinaApi.config.revokeoauth2+param}).
+            $http({method:'GET', url: 'https://api.weibo.com/oauth2/revokeoauth2'+param}).
                 success(function(data, status) {
-                    localStorage.access_token = "";
-                    localStorage.uid = "";
-                    $scope.user = [];
-                    localStorage.timeline = [];
+                    localStorage.access_token = null;
+                    localStorage.uid = null;
+                    $scope.user = null;
+                    localStorage.user=null;
+                    localStorage.timeline = null;
                     localStorage.scrollTop = 0;
                     localStorage.maxid = null;
                 }).
@@ -85,7 +104,7 @@ angular.module('myApp.controllers', [])
   }])
   .controller('weiboCtrl', ['$scope','$http','sinaApi',function($scope,$http,sinaApi) {
         console.log('start:'+(new Date()).getTime());
-        $scope.isAuth = true;
+        $scope.isAuth = false;
         $scope.showMain = false;
         $scope.tabs = {
             home:"home",
@@ -95,8 +114,6 @@ angular.module('myApp.controllers', [])
             user:"user",
             follows:"follows"
         }
-
-        $scope.oAuthPath = 'https://api.weibo.com/oauth2/authorize?client_id='+sinaApi.config.oauth_key+'&redirect_uri=https://api.weibo.com/oauth2/default.html&response_type=code';
 
         chrome.webRequest.onResponseStarted.addListener(function(details){
             var pin = details.url;
@@ -134,10 +151,11 @@ angular.module('myApp.controllers', [])
                 $scope.currentuser = data;
                 localStorage.user = JSON.stringify($scope.user);
                 //验证已授权后再进行初始化
-                $scope.init();
+//                $scope.init();
             },function(data){
+                console.debug("not auth===========");
                 $scope.isAuth = false;
-                $("#oAuthIframe").attr("src",$scope.oAuthPath);
+//                $("#oAuthIframe").attr("src",$scope.oAuthPath);
             });
         };
 
@@ -145,18 +163,27 @@ angular.module('myApp.controllers', [])
             if(data.statuses.length>1){
                 //区分获取最新和向下刷新
                 if(type=='refresh'){
-                    $scope.timeline = [];
-                    $scope.timeline = data.statuses;
-                    $("#warp").animate({'scrollTop':0},300);
-                    localStorage.scrollTop = 0;
+                    console.debug("timeline length:"+data.statuses.length)
+                    $("#warp").animate({'scrollTop':0},50,'swing',function(){
+                        localStorage.scrollTop = 0;
+//                        $scope.timeline = [];
+                        $scope.timeline = data.statuses;
+                        $scope.$apply();
+                        $scope.loading = false;
+                        chrome.extension.getBackgroundPage().timeline = $scope.timeline;
+                        sessionStorage.timeline = $scope.timeline;
+                        $scope.maxid = data.statuses[data.statuses.length-1].id-3;
+                    });
                 }else{
                     $scope.timeline = $scope.timeline.concat(data.statuses);
+                    $scope.loading = false;
+                    chrome.extension.getBackgroundPage().timeline = $scope.timeline;
+                    sessionStorage.timeline = $scope.timeline;
+                    $scope.maxid = data.statuses[data.statuses.length-1].id-3;
                 }
-                $scope.maxid = data.statuses[data.statuses.length-1].id-3;
-                localStorage.timeline = JSON.stringify($scope.timeline);
                 localStorage.maxid = $scope.maxid;
             }
-            $scope.loading = false;
+
         }
 
         $scope.get_mentions_timeline=function(type){
@@ -200,11 +227,13 @@ angular.module('myApp.controllers', [])
 
         $scope.get_home_timeline = function(type){
             $scope.loading = true;
-            console.log("maxid:"+$scope.maxid);
+            console.debug("maxid:"+$scope.maxid);
             sinaApi.home_timeline($scope.maxid,function(data){
                 $scope._timeline_suc(data,type);
-                $scope.unreadTimeLineNum = 0;
-                localStorage.unreadTimeLineNum = 0;
+                if(type=='refresh'){
+                    $scope.unreadTimeLineNum = 0;
+                    localStorage.unreadTimeLineNum = 0;
+                }
             },function(data){
                 $scope.loading = false;
             });
@@ -214,7 +243,7 @@ angular.module('myApp.controllers', [])
             if(!screen_name)
                 screen_name = $scope.target_user.screen_name;
             $scope.loading = true;
-            console.log("maxid:"+$scope.maxid);
+            console.debug("maxid:"+$scope.maxid);
             sinaApi.user_timeline(screen_name,$scope.maxid,function(data){
                 $scope._timeline_suc(data,type);
             },function(data){
@@ -376,6 +405,24 @@ angular.module('myApp.controllers', [])
             $scope.current_category = {category:_category};
         }
 
+        $scope.newWindow = function(){
+            function _get_open_window_args(width, height) {
+                width = 520;
+                height = 600;
+                var left = (window.screen.availWidth - width) / 2;
+                var win_args = {width: width, height: height, left: left, top: 30, toolbar: 'no', menubar: 'no', location: 'no', resizable: 'no', scrollbars: 'yes', status: 'yes'};
+                var args_str = '';
+                for (var k in win_args) {
+                    args_str += k + '=' + win_args[k] + ',';
+                }
+                return args_str.substring(0, args_str.length - 1);
+            }
+            var url = 'longtxt.html';
+            chrome.tabs.create({"url":url,"selected":true}, function(tab){
+            });
+//            window.open(url, '_blank', _get_open_window_args(600,600));
+        }
+
         $scope.showCommentText = function(item,type,$event){
 //            Example.show("发送成功");
             $scope.current_category = {category:$scope.emotions_category[0]};
@@ -513,14 +560,19 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.loadUser = function(screen_name){
-            var _user = JSON.parse(localStorage.theuser);
+
+        };
+
+        $scope._loadUser = function(screen_name){
             var uid = null;
-            if(!screen_name){
-                if(localStorage.screen_name)
-                    screen_name = _user.screen_name;
-                else
+//            if(!screen_name){
+//                if(localStorage.target_user){
+//                    $scope.target_user = JSON.stringify(localStorage.target_user)
+//                    screen_name =$scope.target_user.sreen_name;
+//                }
+//                else
                     uid = $scope.uid;
-            }
+//            }
             var _suc = function(data){
                 $scope.target_user = data;
                 localStorage.target_user = JSON.stringify(data);
@@ -532,10 +584,10 @@ angular.module('myApp.controllers', [])
                 $scope.maxid = null;
                 $scope.get_user_timeline($scope.target_user.screen_name,'refresh');
             };
-            if(screen_name)
-                sinaApi.user_show(screen_name,_suc,function(data){
-                });
-            else
+//            if(screen_name)
+//                sinaApi.user_show(screen_name,_suc,function(data){
+//                });
+//            else
                 sinaApi.user_show_byid(uid,_suc,function(data){
                 });
         }
@@ -554,8 +606,8 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.gotoOption = function(){
-            chrome.extension.getOptions
-            chrome.tabs.create({"url":"chrome-extension://pnkacoeejlfoikeaiobjennblgpoaaao/option.html","selected":true}, function(tab){
+//            chrome.extension.getOptions;
+            chrome.tabs.create({"url":"option.html","selected":true}, function(tab){
             });
         }
 
@@ -643,17 +695,30 @@ angular.module('myApp.controllers', [])
             $scope.uid=localStorage.uid;
             $scope.current_user_name = localStorage.current_user_name;
             $scope.access_token = localStorage.access_token;
-            if($scope.uid&&$scope.access_token){
+//            console.log("uid="+$scope.uid);
+//            console.log("access_token="+$scope.access_token);
+            if(($scope.uid!='null')&&($scope.access_token!='null'))
+                console.log(($scope.uid!=null)&&($scope.access_token!=null));
+            else
+                console.log('right');
+            if(($scope.uid!='null')&&($scope.access_token!='null')){
                 try{
                     $scope.currentuser = JSON.parse(localStorage.user);
                 }catch(e){
                     console.log(e);
                     $scope.initUserInfo($scope.uid);
                 }
+                $scope.isAuth = true;
             }
             else{
+                console.debug("not auth===========11111");
                 $scope.isAuth = false;
-                $("#oAuthIframe").attr("src",$scope.oAuthPath);
+//                $("#oAuthIframe").attr("src",$scope.oAuthPath);
+//                $("#oAuthIframe").bind('load',function(even){
+//                    debugger;
+//                    console.log($("#oAuthIframe"));
+//                });
+//                $scope.$apply();
             }
             return $scope.isAuth;
         }
@@ -665,7 +730,7 @@ angular.module('myApp.controllers', [])
             $scope.unreadCommentNum = 0;
             $scope.unreadAtNum = 0;
             $scope.appid = "";
-            $scope.oAuthPath = "";
+            $scope.oAuthPath = 'https://api.weibo.com/oauth2/authorize?client_id='+sinaApi.config.oauth_key+'&redirect_uri=https://api.weibo.com/oauth2/default.html&response_type=code';
             $scope.maxid=null;
             $scope.isloading = false;
             $scope.timeline = new Array();
@@ -682,68 +747,79 @@ angular.module('myApp.controllers', [])
             console.log('init end:'+(new Date()).getTime());
 //            $scope.loadFriends(0);
         }
-
+        $scope.firstload = true;
 //      当ngrepeat渲染完毕后
         $scope.$on('ngRepeatFinished', function(ngRepeatFinishedEvent) {
-            console.log('ngRepeatFinished:'+(new Date()).getTime());
-            console.log("scroll to:"+localStorage.scrollTop);
-            $("#warp")[0].scrollTop = localStorage.scrollTop;
+            if($scope.firstload==true ){
+                console.log('ngRepeatFinished:'+(new Date()).getTime());
+                console.log("scroll to:"+localStorage.scrollTop);
+                $("#warp")[0].scrollTop = localStorage.scrollTop;
 //          读取表情
-            $scope.emotions_category = chrome.extension.getBackgroundPage().emotions_category;
-            $scope.current_category = {category:$scope.emotions_category[0]};
-            $scope.emotions = chrome.extension.getBackgroundPage().orig_emotions;
-            if($scope.inited)
-                return;
-            $scope.inited = true;
+                $scope.emotions_category = chrome.extension.getBackgroundPage().emotions_category;
+                $scope.current_category = {category:$scope.emotions_category[0]};
+                $scope.emotions = chrome.extension.getBackgroundPage().orig_emotions;
+                if($scope.inited)
+                    return;
+                $scope.inited = true;
 //          初始化选择图片的popver
-            $("#selectImgBtn").popover({
-                placement : 'bottom', // top, bottom, left or right
-                html: 'true',
-                content : $('#uploadimg_div'),
-                trigger: 'manual'
-            });
+                $("#selectImgBtn").popover({
+                    placement : 'bottom', // top, bottom, left or right
+                    html: 'true',
+                    content : $('#uploadimg_div'),
+                    trigger: 'manual'
+                });
 //          初始化选择表情的popver
-            $("#showEmotionsBtn").popover({
-                placement : 'bottom', // top, bottom, left or right
-                html: 'true',
-                content : $('#emotions_div'),
-                trigger: 'manual'
-            });
-            //绑定滚动事件，每次滚动都记录当前页面位置
-            $("#warp").scroll(function() {
-                var nDivHight = $("#warp").height();
-                var nScrollHight = $(this)[0].scrollHeight;
-                var nScrollTop = $(this)[0].scrollTop;
-                localStorage.scrollTop = nScrollTop;
-                console.log(nScrollTop);
-                if(nScrollTop + nDivHight >= nScrollHight&&$scope.loading == false){
-                    console.log("loadnewdata");
-                    $scope.get_timeline_next();
-                }
+                $("#showEmotionsBtn").popover({
+                    placement : 'bottom', // top, bottom, left or right
+                    html: 'true',
+                    content : $('#emotions_div'),
+                    trigger: 'manual'
+                });
+                //绑定滚动事件，每次滚动都记录当前页面位置
+                $("#warp").scroll(function() {
+                    if($scope.loading!=true){
+                        var nDivHight = $("#warp").height();
+                        var nScrollHight = $(this)[0].scrollHeight;
+                        var nScrollTop = $(this)[0].scrollTop;
+                        localStorage.scrollTop = nScrollTop;
+//                        console.log(nScrollTop);
+                        if(nScrollTop + nDivHight >= (nScrollHight-20)&&$scope.loading == false){
+//                        console.log("loadnewdata");
+                            $scope.get_timeline_next();
+                        }
+                    }
+                });
+                //绑定选择文件选择事件
+                $('#files').on('change',function(event){
+                    $scope.handleFileSelect(event);
+                });
+                $scope.firstload = false;
+            }
 
-
-            });
-            //绑定选择文件选择事件
-            $('#files').on('change',function(event){
-                $scope.handleFileSelect(event);
-            });
         });
 
         angular.element(document).ready(function () {
             console.log('document ready:'+(new Date()).getTime());
             setTimeout(function(){
+                $scope.init();
                 if($scope.checkIsAuth()){
                     $scope.showMain = true;
+                    $scope.isAuth = true;
                     console.log('data load start:'+(new Date()).getSeconds());
-                    if(!localStorage.current_icon)
+                    console.log('===================sessionStorage.timeline=========================');
+                    console.log(sessionStorage.timeline);
+//                    if(!localStorage.current_icon)
                         localStorage.current_icon = "#home_btn"
                     $scope.current_tab = localStorage.current_tab;
-                    $("a.active").removeClass("active");
-                    $(localStorage.current_icon).addClass("active");
+//                    $("a.active").removeClass("active");
+//                    $(localStorage.current_icon).addClass("active");
                     if(localStorage.target_user&&localStorage.target_user!='undefined')
                         $scope.target_user = JSON.parse(localStorage.target_user);
-                    if(localStorage.timeline){
-                        $scope._timeline_suc({statuses:JSON.parse(localStorage.timeline)});
+
+                    var _status = chrome.extension.getBackgroundPage().timeline;
+                    console.log(_status);
+                    if(_status&&_status.length>0){
+                        $scope._timeline_suc({statuses:_status});
                     }else{
                         $scope.loadHome();
                     }
@@ -765,14 +841,136 @@ angular.module('myApp.controllers', [])
             },25);
 
         });
-        $scope.init();
+
         //5秒检测一次未读数
         setInterval(function(){
             $scope.unreadTimeLineNum = localStorage.unreadTimeLineNum;
-        }, 5000);
+            $scope.$apply();
+        }, 1000);
 
      }
-  ]);
+  ])
+  .controller('longtxtCtrl',['$scope','$http','sinaApi',function($scope,$http,sinaApi) {
+        $scope.emotions_category = chrome.extension.getBackgroundPage().emotions_category;
+        $scope.current_category = {category:$scope.emotions_category[0]};
+        $scope.emotions = chrome.extension.getBackgroundPage().orig_emotions;
+        $scope.current_page = 0;
+        $scope.page_size = 5;
+        $scope.commentbox ={};
+        $scope.commentbox.title = "写微博";
+        $scope.commentbox.comment_txt ="";
+        $scope.commentbox.button_txt = "发送";
+        $scope.current_category = {category:$scope.emotions_category[0]};
+        $scope.commentbox.pic = null;
+        $scope.commentbox.lastCharNum = 140;
+        $scope.save_btn_txt = '内容保存为图片';
+        //          读取表情
+
+        console.log($scope.emotions_category);
+        console.log($scope.current_category);
+        console.log($scope.emotions);
+        $scope.$watch('commentbox.comment_txt', function(newValue, oldValue) {
+            console.log('txt changed')
+            if(newValue)
+                $scope.commentbox.lastCharNum = parseInt((280-getLength(newValue))/2);
+            else
+                $scope.commentbox.lastCharNum = 140;
+            console.log($scope.commentbox.lastCharNum)
+        });
+
+        $scope._send_suc = function(){
+//            Example.show("发送成功")
+            $scope.commentbox.comment_txt = "";
+            $scope.hideCommentText();
+        };
+
+        $scope._send_err = function() {
+//            Example.show("发送失败")
+        };
+
+        $scope.update = function(){
+            if($scope.commentbox.pic)
+                $scope.upload();
+            else
+                sinaApi.update($scope.commentbox.comment_txt,
+                    function(){
+                        $scope._send_suc();
+                    },
+                    function(){
+                        $scope._send_err();
+                    }
+                )
+        };
+
+        $scope.upload = function(){
+            sinaApi.upload($scope.commentbox.comment_txt,$scope.commentbox.pic,
+                function(){
+                    $scope._send_suc();
+                },
+                function(){
+                    $scope._send_err();
+                }
+            )
+        };
+
+
+
+        $scope.insert_emotion = function(emotion){
+            $scope.insertText($("#comment_textarea")[0],emotion)
+        };
+
+
+
+        $scope.category_change = function(_category){
+            $scope.current_category = {category:_category};
+        };
+
+        $scope.insertText = function(obj,str) {
+            if (document.selection) {
+                var sel = document.selection.createRange();
+                sel.text = str;
+            } else if (typeof obj.selectionStart === 'number' && typeof obj.selectionEnd === 'number') {
+                var startPos = obj.selectionStart,
+                    endPos = obj.selectionEnd,
+                    cursorPos = startPos,
+                    tmpStr = obj.value;
+                $scope.commentbox.comment_txt = tmpStr.substring(0, startPos) + str + tmpStr.substring(endPos, tmpStr.length);
+                cursorPos += str.length;
+                obj.selectionStart = obj.selectionEnd = cursorPos;
+            } else {
+                $scope.commentbox.comment_txt += str;
+            }
+        };
+
+        $scope.save_img=function(){
+            if($scope.save_btn_txt == '内容保存为图片'){
+                $("#editor").append("<div id='copy_right_div'><br><br><br> <div class='top_line'>由WeiKr长微博工具生成</div></div>")
+                html2canvas($("#editor"), {
+                    letterRendering:true,
+                    allowTaint:true,
+                    onrendered: function(canvas) {
+                        $("#canvas-div").append(canvas);
+                        var ctx=canvas.getContext("2d");
+                        ctx.scale(2,2);
+                        $("#editor_div").hide();
+                        $scope.commentbox.pic =dataUrlToBlob(Canvas2Image.saveAsPNG(canvas, true).src);
+                        $scope.save_btn_txt = '返回编辑';
+                        $scope.$apply();
+                    }
+                });
+            }else{
+                $("#editor_div").show();
+                $("#copy_right_div").remove();
+                $("#canvas-div").empty();
+                $scope.commentbox.pic = null;
+                $scope.save_btn_txt = '内容保存为图片';
+                $scope.$apply();
+            }
+
+
+        };
+
+    }]);
 
 
 var Example = (function() {

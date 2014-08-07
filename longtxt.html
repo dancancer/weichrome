@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en" ng-app="myApp" xmlns="http://www.w3.org/1999/html" style="overflow-y: auto;">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>长微博</title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.css"/>
+    <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css">
+    <link rel="stylesheet" href="css/myweibo.css"/>
+    <!--<link href="css/prettify.css" rel="stylesheet">-->
+    <!--<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">-->
+    <!--<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">-->
+    <!--<link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">-->
+    <style>
+        #editor {
+            /*max-height: 250px;*/
+            min-height: 250px;
+            background-color: white;
+            border-collapse: separate;
+            border: 1px solid rgb(204, 204, 204);
+            padding: 4px;
+            box-sizing: content-box;
+            -webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
+            border-top-right-radius: 3px; border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px; border-top-left-radius: 3px;
+            overflow: scroll;
+            outline: none;
+        }
+        #voiceBtn {
+            width: 20px;
+            color: transparent;
+            background-color: transparent;
+            transform: scale(2.0, 2.0);
+            -webkit-transform: scale(2.0, 2.0);
+            -moz-transform: scale(2.0, 2.0);
+            border: transparent;
+            cursor: pointer;
+            box-shadow: none;
+            -webkit-box-shadow: none;
+        }
+
+        div[data-role="editor-toolbar"] {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .dropdown-menu a {
+            cursor: pointer;
+        }
+        .popover{
+            max-width: 720px;
+        }
+        .clear { clear: both;
+            max-height: 90000px;
+        }
+        .scrollable-menu {
+            height: auto;
+            max-height: 200px;
+            overflow-x: hidden;
+        }
+        #editor img{
+            max-width: 100%;
+        }
+
+        .no-text-shadow{
+            text-shadow: none;
+        }
+
+        .zhuangbility-text-shadow{
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.125);
+        }
+    </style>
+</head>
+<body style="text-shadow: 0 1px 0 #FFFFFF;background: #f5f5f5;padding: 3px;margin:auto;width: 960px;overflow-y: visible;">
+
+
+<div ng-controller="longtxtCtrl" style="width: 720px;margin: auto;">
+    <h1>WeiKr 长微博工具</h1>
+    <div id="comment_text_div" class="panel panel-default shadow"
+         style="display:block; position: relative;z-index: 9999;width:100%;top:0px;">
+        <div class="panel-heading">长微博<span class="panel-title" style="float:right">{{commentbox.lastCharNum}}</span>
+        </div>
+
+        <div class="panel-body">
+            <textarea class="form-control" id="comment_textarea" ng-model="commentbox.comment_txt" placeholder="写点啥..."
+                      style="height:100px;border-radius:0 0 0 0;">
+            </textarea>
+        </div>
+        <div class="panel-footer" style="height: 50px">
+            <div style="float: left;margin-top: 5px;margin-left: 5px">
+                <a href="" id="showEmotionsBtn"><i class="fa fa-smile-o" style="font-size: 28px"></i></a>
+                <input type="file" id="files" name="files[]" multiple style="display: none"/>
+            </div>
+
+            <div style="float: right;margin-top: -5px;margin-right: 5px;margin-bottom: 5px">
+                <button id="save_pic" ng-click="save_img()" class="btn btn-default" style="margin-top: 5px;" type="button">
+                    {{save_btn_txt}}
+                </button>
+                <button class="btn btn-primary" style="margin-top: 5px;" ng-click="update()" type="button">
+                    {{commentbox.button_txt}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px" class="editer-container clear" id="editor_div" >
+        <div id="alerts"></div>
+        <div class="navbar navbar-default pinned " data-role="editor-toolbar" data-target="#editor" style="margin-bottom: 5px;z-index: 8888">
+            <form class="navbar-form " role="search">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Font">
+                    <i class="fa fa-font"></i>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu scrollable-menu" role="menu">
+                </ul>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" title="Font Size">
+                    <i class="fa fa-text-height"></i>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a data-edit="fontSize 6"><font size="6">再大点</font></a></li>
+                    <li><a data-edit="fontSize 5"><font size="5">挺合适</font></a></li>
+                    <li><a data-edit="fontSize 3"><font size="3">不能再小了</font></a></li>
+                </ul>
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-default" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
+                <a class="btn btn-default" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="fa fa-italic"></i></a>
+                <!--<a class="btn btn-default" data-edit="strikethrough" title="Strikethrough"><i class="fa fa-strikethrough"></i></a>-->
+                <!--<a class="btn btn-default" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>-->
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-default" data-edit="insertunorderedlist" title="Bullet list"><i class="fa fa-list-ul"></i></a>
+                <a class="btn btn-default" data-edit="insertorderedlist" title="Number list"><i class="fa fa-list-ol"></i></a>
+                <a class="btn btn-default" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="fa fa-outdent"></i></a>
+                <a class="btn btn-default" data-edit="indent" title="Indent (Tab)"><i class="fa fa-indent"></i></a>
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-default" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
+                <a class="btn btn-default" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
+                <a class="btn btn-default" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="fa fa-align-right"></i></a>
+                <a class="btn btn-default" data-edit="justifyfull" title="Justify (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
+            </div>
+
+            <div class="btn-group">
+                <a class="btn btn-default" id="pictureBtn" title="Insert picture (or just drag & drop)" ><i class="fa fa-picture-o"></i></a>
+                <input type="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
+            </div>
+            <div class="btn-group">
+                <a class="btn btn-default" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
+                <a class="btn btn-default" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
+            </div>
+            <input type="text" data-edit="inserttext" id="voiceBtn" x-webkit-speech="">
+            </form>
+        </div>
+
+        <div id="editor" class="clear no-text-shadow" style="overflow: hidden;position: relative;padding: 15px;font-size: medium;" >
+        </div>
+    </div>
+    <div id="canvas-div">
+    </div>
+
+    <div id="emotions_div" style="width: 410px;padding: 10px;display: none;z-index: 9999;">
+        <button type="button" id="clost_em" style="position: absolute;top: 3px;margin-left: 393px;"
+                class="close">
+            <i class="fa fa-times"></i>
+        </button>
+        <ul class="list-unstyled list-inline" style="display: block;float: left;width: 100%;margin: auto;">
+            <li style="padding: 2px;min-width: 20px;float: left">
+                <button type="button" class="btn btn-link" ng-init="current_page=0" ng-disabled="current_page == 0"
+                        ng-click="current_page=current_page-1">
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+            </li>
+            <li style="padding: 2px;min-width: 20px;float: left;margin-top: 4px;"
+                ng-repeat="category in emotions_category|startFrom:current_page*page_size | limitTo:page_size">
+                <a href="" style="position: relative;display: inline-block;" ng-click="category_change(category)">
+                    [{{category}}]
+                </a>
+            </li>
+            <li style="padding: 2px;min-width: 20px;float: right;">
+                <button type="button" class="btn btn-link "
+                        ng-disabled="current_page >= emotions_category.length/page_size - 1"
+                        ng-click="current_page=current_page+1">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </li>
+        </ul>
+        <ul class="list-unstyled list-inline" style="display: block;float: left;margin: auto;padding-bottom: 15px">
+            <li style="padding: 2px;min-width: 20px;" ng-repeat="emotion in emotions|filter:current_category">
+                <a href="" style="position: relative;display: inline-block;" ng-click="insert_emotion(emotion.phrase)">
+                    <img ng-src="{{emotion.url}}">
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<script src="lib/angular/angular.min.js"></script>
+<script src="lib/jquery/jquery-2.1.1.min.js"></script>
+<script src="lib/exif/exif.js"></script>
+<script src="lib/exif/binaryajax.js"></script>
+<script src="lib/bootstrap/bootstrap.js"></script>
+<!--<script src="lib/google-code-prettify/prettify.js"></script>-->
+<script src="lib/jquery/hotkey.js"></script>
+<script src="lib/wysiwyg/bootstrap-wysiwyg.js"></script>
+<script src="lib/html2canvas.js"></script>
+<script src="lib/base64.js"></script>
+<script src="lib/canvas2image.js"></script>
+<script src="lib/jquery.pin.js"></script>
+<script src="lib/emoji/emoji.js"></script>
+<script src="js/app.js"></script>
+<script src="js/services.js"></script>
+<script src="js/bindonce.min.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/directives.js"></script>
+<script src="js/complies.js"></script>
+<script src="js/util.js"></script>
+<script src="js/longtxt.js"></script>
+
+
+
+
+</body>
+</html>

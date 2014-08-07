@@ -18,6 +18,16 @@ angular.module('myApp.filters', []).
             return text.replace('thumbnail', 'square')
         }
     })
+    .filter('large', function () {
+        return function (text) {
+            return text.replace('thumbnail', 'large')
+        }
+    })
+    .filter('bmiddle', function () {
+        return function (text) {
+            return text.replace('thumbnail', 'bmiddle')
+        }
+    })
     .filter('startFrom', function() {
         return function(input, start) {
             start = +start; //parse to int
@@ -49,6 +59,8 @@ angular.module('myApp.filters', []).
                 var atuser = new RegExp("(@[-|\\u303F-\\u9FFFA-Za-z0-9_]+)", "g");
                 var onlyuser = new RegExp("@([\\u4E00-\\u9FA5A-Za-z0-9_]+)", "g")
                 var list = uniq(text.match(atuser));
+                text=text.replace(/\</g,"&lt;");
+                text=text.replace(/\>/g,"&gt;");
                 //替换链接
                 text = text.replace(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?/g, function (url) {
                     return "<a rclicka href=\"" + url + "\">" + url + "</a>";

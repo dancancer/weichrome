@@ -5,224 +5,272 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>手边微博</title>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css"/>
     <link rel="stylesheet" href="css/myweibo.css"/>
     <link rel="stylesheet" href="css/emoji/emoji.css"/>
     <style>
-        .warp1{width:600px;margin:0 auto;}
-        .head{height: 50px;}
+        .warp1 {
+            width: 600px;
+            margin: 0 auto;
+        }
+
+        .head {
+            height: 50px;
+        }
     </style>
 </head>
-<body  style="overflow:hidden;height: 590px;
-    text-shadow: 0 1px 0 #FFFFFF;background: rgba(242,242,242,1);font-family: '微软雅黑'" >
-<div id = "a1" ng-controller="weiboCtrl"  style="z-index: 1;overflow: hidden;height:100%;">
-    <div class="tab-content" ng-if="!isAuth">
-        <h2>请先进行登录授权。</h2>
-        <div style="text-align: center">
-            <iframe id="oAuthIframe"    src="" style="width: 600px;height: 600px;border: none" ></iframe>
-        </div>
+<body style="overflow:hidden;height: 590px;
+    text-shadow: 0 1px 0 #FFFFFF;background: rgba(242,242,242,1);font-family: '微软雅黑'">
+<div id="a1" ng-controller="weiboCtrl" style="z-index: 1;overflow: hidden;height:100%;">
+<div class="tab-content" ng-show="isAuth==false">
+    <h2>请先到<a href="" ng-click="gotoOption()">设置</a>界面进行用户授权。</h2>
 
+    <div style="text-align: center">
+        <iframe id="oAuthIframe" src="" style="width: 600px;height: 600px;border: none" ></iframe>
     </div>
-    <div id="tab-content" class="tab-content" ng-if="isAuth" style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
-        <div style="width: 600px;padding-left: 10px;position: relative;overflow: hidden" >
-            <header></header>
-            <div id="infodiv" class="popover right fade in" ng-click="hideinfo()" style="position: absolute">
-                <div class="arrow"></div>
-                <h3 class="popover-title" style="display: none;"></h3>
-                <div class="popover-content"></div>
-            </div>
-            <div id="warp" ng-if="showMain" style="margin-top: 55px;height:535px;overflow-y:auto;overflow-x: hidden;" bindonce  >
-                <div ng-if="current_tab==tabs.user" class="panel panel-default" style="height: 150px;width:580px;display: block">
-                    <div class="panel-body">
-                        <div style="text-align: center;height: 120px;width: 120px;float:left;margin-right: 10px;" >
-                            <img class="img-thumbnail" ng-src="{{target_user.avatar_large}}">
-                        </div>
-                        <div style="position: relative;padding-top: 10px;">
-                            <b ng-bind="target_user.name"></b>
-                            <ul class="list-inline list-unstyled">
-                                <li>粉丝</li>
-                                <li><a ng-bind="target_user.followers_count"></a></li>
-                                <li>微博</li>
-                                <li><a ng-bind="target_user.statuses_count"></a></li>
-                                <li>关注</li>
-                                <li><a ng-bind="target_user.friends_count"></a></li>
-                            </ul>
-                            <span ng-bind="target_user.description"></span>
-                            <div style="float: right;position: absolute;top: 10px;left: 480px;">
-                                <a ng-if="target_user.following">已关注</a>
-                                <a ng-if="!target_user.following">+关注</a>
-                            </div>
-                        </div>
 
+</div>
+<div id="tab-content" class="tab-content" ng-show="isAuth==true"
+     style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
+    <div style="width: 600px;padding-left: 10px;position: relative;overflow: hidden">
+        <header></header>
+        <div id="infodiv" class="popover right fade in" ng-click="hideinfo()" style="position: absolute">
+            <div class="arrow"></div>
+            <h3 class="popover-title" style="display: none;"></h3>
+
+            <div class="popover-content"></div>
+        </div>
+        <div id="warp" ng-if="showMain" style="margin-top: 55px;height:535px;overflow-y:auto;overflow-x: hidden;">
+            <div ng-if="current_tab==tabs.user" class="panel panel-default"
+                 style="height: 150px;width:580px;display: none">
+                <div class="panel-body">
+                    <div style="text-align: center;height: 120px;width: 120px;float:left;margin-right: 10px;">
+                        <img class="img-thumbnail" ng-src="{{target_user.avatar_large}}">
                     </div>
-                </div>
-                <div  id="repeatContent" on-finish-render ng-repeat="item in timeline track by item.id" class="bottom_line"
-                 style="margin-top: 10px;width: 585px;">
-                    <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
-                        <div name="avatar" style="width: 60px;float: left">
-                            <a ng-href="http://www.weibo.com/{{item.user.profile_url}}" ng-click="loadUser(item.user.screen_name)" rclicka>
-                                <img userinfo ng-src="{{item.user.avatar_large}}" style="width: 60px; height: 60px;" alt="" class="img-rounded">
-                            </a>
+                    <div style="position: relative;padding-top: 10px;">
+                        <b ng-bind="target_user.name"></b>
+                        <ul class="list-inline list-unstyled">
+                            <li>粉丝</li>
+                            <li><a ng-bind="target_user.followers_count"></a></li>
+                            <li>微博</li>
+                            <li><a ng-bind="target_user.statuses_count"></a></li>
+                            <li>关注</li>
+                            <li><a ng-bind="target_user.friends_count"></a></li>
+                        </ul>
+                        <span ng-bind="target_user.description"></span>
+
+                        <div style="float: right;position: absolute;top: 10px;left: 480px;">
+                            <a ng-if="target_user.following">已关注</a>
+                            <a ng-if="!target_user.following">+关注</a>
                         </div>
-                        <div name="name&text" style=";float: left;padding: 2px;margin-left:10px;margin-bottom: 10px;min-height: 60px;width: 510px;">
-                            <a ng-href="http://www.weibo.com/{{item.user.profile_url}}"
-                               ng-click="loadUser(item.user.screen_name)" rclicka>
-                                <b>{{item.user.name}}:</b>
+                    </div>
+
+                </div>
+            </div>
+            <div id="repeatContent" on-finish-render bindonce ng-repeat="item in timeline track by item.id"
+                 class="bottom_line"
+                 style="margin-top: 10px;width: 585px;">
+                <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
+                    <div name="avatar" style="width: 60px;float: left">
+                        <a bo-href="'http://www.weibo.com/'+item.user.profile_url"
+                           ng-click="loadUser(item.user.screen_name)" rclicka>
+                            <img userinfo bo-src="item.user.avatar_large" style="width: 60px; height: 60px;" alt=""
+                                 class="img-rounded">
+                        </a>
+                    </div>
+                    <div name="name&text"
+                         style=";float: left;padding: 2px;margin-left:10px;margin-bottom: 10px;min-height: 60px;width: 510px;">
+                        <a bo-href="'http://www.weibo.com/'+item.user.profile_url"
+                           ng-click="loadUser(item.user.screen_name)" rclicka>
+                            <b bo-text="item.user.name+':'"></b>
+                        </a>
+                        <br>
+                        <span compile="item.text|weibotxt"></span>
+                    </div>
+
+                    <div name="retweetedContant" style="margin-top: -5px;position: relative;float: left;"
+                         ng-if="item.retweeted_status">
+                        <div class="highlight arrow_box " style="text-shadow: 0 1px 0 #F9F9F9;margin-left: 70px;padding: 10px;
+                                margin-bottom: 10px;min-height: 40px;width: 510px;position: relative">
+                            <a bo-href="'http://www.weibo.com/'+item.retweeted_status.user.profile_url"
+                               ng-click="loadUser(item.retweeted_status.user.screen_name)" rclicka>
+                                <b bo-text="'@'+item.retweeted_status.user.name+':'"></b>
                             </a>
                             <br>
-                            <span compile="item.text|weibotxt"></span>
-                        </div>
+                            <span compile="item.retweeted_status.text|weibotxt"></span>
 
-                        <div name="retweetedContant" style="margin-top: -5px;position: relative;float: left;" ng-if="item.retweeted_status">
-                            <div class="highlight arrow_box " style="text-shadow: 0 1px 0 #F9F9F9;margin-left: 70px;padding: 10px;
-                                margin-bottom: 10px;min-height: 40px;width: 510px;position: relative">
-                                <a ng-href="http://www.weibo.com/{{item.retweeted_status.user.profile_url}}"
-                                   ng-click="loadUser(item.retweeted_status.user.screen_name)" rclicka>
-                                    <b>@{{item.retweeted_status.user.name}}:</b>
-                                </a>
-                                <br>
-                                <span compile="item.retweeted_status.text|weibotxt"></span>
-
-                                <br>
-                                <singlepic item="item.retweeted_status"></singlepic>
-                                <multipic item="item.retweeted_status"></multipic>
-                                <div  class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
-                                </div>
-                                <div style="margin-bottom: 14px">
-                                    <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;">{{(item.retweeted_status.created_at)|mydate}} 来自</div>
-                                    <div class="action" style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;" compile="item.retweeted_status.source"></div>
+                            <br>
+                            <singlepic item="item.retweeted_status"></singlepic>
+                            <multipic item="item.retweeted_status"></multipic>
+                            <div class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
+                            </div>
+                            <div style="margin-bottom: 14px">
+                                <div class="action"
+                                     style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;"
+                                     bo-text="(item.retweeted_status.created_at|mydate) + '来自'"></div>
+                                <div class="action"
+                                     style="float: left;font-size: 12px;margin-top: 2px;margin-bottom: 3px;"
+                                     compile="item.retweeted_status.source"></div>
                                 <actionbarrt ng-if="current_tab != tabs.comments"></actionbarrt>
+                            </div>
+                            <div id="recommentsdiv{{$index}}" class="panel-collapse collapse"
+                                 style="width:100%;padding: 5px">
+                                <div commentrow class="row"
+                                     style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
+                                     ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
+                                     show-comment-text="showCommentText(comment,'reply',$event)" comment="comment"
+                                     ng-repeat="comment in item.retweeted_status.comments">
                                 </div>
-                                <div id="recommentsdiv{{$index}}" class="panel-collapse collapse" style="width:100%;padding: 5px">
-                                    <div commentrow class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
-                                         ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
-                                         show-comment-text="showCommentText(comment,'reply',$event)" comment="comment"
-                                         ng-repeat="comment in item.retweeted_status.comments" >
-                                    </div>
-                                    <commentpager item="item.retweeted_status" pre="get_comments(item.retweeted_status,'pre')"
-                                                  next="get_comments(item.retweeted_status,'next')"></commentpager>
-                                </div>
+                                <commentpager item="item.retweeted_status"
+                                              pre="get_comments(item.retweeted_status,'pre')"
+                                              next="get_comments(item.retweeted_status,'next')"></commentpager>
                             </div>
                         </div>
-                        <div style="margin-left: 70px">
-                            <singlepic item="item"></singlepic>
-                            <multipic item="item"></multipic>
-                        </div>
-                        <div style="margin-left: 70px">
-                            <div class="action" style="float: left;font-size: 12px;margin-top: 2px;">{{(item.created_at)|mydate}} 来自</div>
-                            <div class="action" style="float: left;font-size: 12px;margin-top: 2px;" compile="item.source"></div>
-                        </div>
-                        <actionbar ng-if="current_tab != tabs.comments"></actionbar>
-                        <div name="reply_actionbar " ng-if="current_tab == tabs.comments" style="margin-right: 5px;clear:right;float: right;">
-                            <a href="" class="action" ng-click="showCommentText(item,'reply',$event)">
-                                <i><span class="glyphicon glyphicon-comment"></span></i>
-                            </a>
-                        </div>
-                        <div id="commentsdiv{{$index}}" class="panel-collapse collapse"
-                             style="width:85%;margin-left: 70px; margin-right:5px;padding: 5px;position: relative;float: left;">
-                            <div commentrow class="row" style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
-                                 ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
-                                 show-comment-text="showCommentText(comment,'reply',$event)" comment="comment"
-                                 ng-repeat="comment in item.comments" >
-                            </div>
-                            <commentpager item="item" pre="get_comments(item,'pre')" next="get_comments(item,'next')"></commentpager>
-                        </div>
                     </div>
-                    <div  class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
+                    <div style="margin-left: 70px">
+                        <singlepic item="item"></singlepic>
+                        <multipic item="item"></multipic>
+                    </div>
+                    <div style="margin-left: 70px">
+                        <div class="action" style="float: left;font-size: 12px;margin-top: 2px;"
+                             bo-text="(item.created_at|mydate) + '来自'">
+                        </div>
+                        <div class="action" style="float: left;font-size: 12px;margin-top: 2px;"
+                             compile="item.source"></div>
+                    </div>
+                    <actionbar ng-if="current_tab != tabs.comments"></actionbar>
+                    <div name="reply_actionbar " ng-if="current_tab == tabs.comments"
+                         style="margin-right: 5px;clear:right;float: right;">
+                        <a href="" class="action" ng-click="showCommentText(item,'reply',$event)">
+                            <i><span class="glyphicon glyphicon-comment"></span></i>
+                        </a>
+                    </div>
+                    <div id="commentsdiv{{$index}}" class="panel-collapse collapse"
+                         style="width:85%;margin-left: 70px; margin-right:5px;padding: 5px;position: relative;float: left;">
+                        <div commentrow class="row"
+                             style="margin-left: 0px;margin-right: 0px; padding: 2px; margin-top:2px; font-size: 12px;"
+                             ng-mouseenter="comment.show = true" ng-mouseleave="comment.show = false"
+                             show-comment-text="showCommentText(comment,'reply',$event)" comment="comment"
+                             ng-repeat="comment in item.comments">
+                        </div>
+                        <commentpager item="item" pre="get_comments(item,'pre')"
+                                      next="get_comments(item,'next')"></commentpager>
                     </div>
                 </div>
-                <div class="bb-alert alert alert-info" style="display: none;">
-                    <span></span>
+                <div class="row" style=" width:95%;margin-left: 0px;padding: 5px;">
                 </div>
-
             </div>
-    </div>
-
-        <div id="comment_text_div"  class="panel panel-default shadow"
-             style="display:none; position: absolute;z-index: 9999;width:80%;top:0px;margin-left: 75px;margin-top:120px;">
-            <div class="panel-heading">{{commentbox.title}}<span class="panel-title" style="float:right">{{commentbox.lastCharNum}}</span></div>
-            <textarea class="form-control" id="comment_textarea" ng-model="commentbox.comment_txt" style="height:100px;border-radius:0 0 0 0;" >
-            </textarea>
-            <div style="float: left;margin-top: 15px;margin-left: 5px">
-                <a href="" id="selectImgBtn" class="action" style="font-size: 14px"
-                   ng-show="commentbox.type=='create'" ng-click="selectImg()">
-                    <i><span class="glyphicon glyphicon-picture"></span></i>
-                </a>
-                <a href="" id="showEmotionsBtn" class="action" ng-click="showEmotions()"><i class="iconfont">&#x3564</i></a>
-                <input type="checkbox" ng-model="chk_also_repost" style="display: none">
-                <a href="" class="action" ng-show="commentbox.type=='comment'" ng-click="chk_also_repost=!chk_also_repost">
-                    <i><span ng-class="{'glyphicon':true,'glyphicon-check':chk_also_repost,'glyphicon-unchecked':!chk_also_repost}"></span></i>同时转发
-                </a>
-                <input  type="checkbox" ng-model="chk_also_comment" style="display: none">
-                <a href="" class="action" ng-show="commentbox.type=='repost'" ng-click="chk_also_comment=!chk_also_comment">
-                    <i><span ng-class="{'glyphicon':true,'glyphicon-check':chk_also_comment,'glyphicon-unchecked':!chk_also_comment}"></span></i>同时评论
-                </a>
-                <input  type="checkbox" ng-model="chk_also_comment_orig" style="display: none">
-                <a href="" class="action" ng-show="commentbox.type=='repost'&&commentbox.repost_with_retweet" ng-click="chk_also_comment_orig=!chk_also_comment_orig">
-                    <i><span ng-class="{'glyphicon':true,'glyphicon-check':chk_also_comment_orig,'glyphicon-unchecked':!chk_also_comment_orig}"></span></i>同时评论原文
-                </a>
-                <input type="file" id="files" name="files[]" multiple style="display: none" />
+            <div class="progress" style="margin-top: 15px" ng-show="loading">
+                <div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                    <span class="sr-only">45% Complete</span>
+                </div>
+            </div>
+            <div class="bb-alert alert alert-info" style="display: none;">
+                <span></span>
             </div>
 
-            <div style="float: right;margin-top: 5px;">
-                <button class="btn btn-default" style="margin-top: 5px;" ng-click="hideCommentText()" type="button">取消</button>
-                <button class="btn btn-primary" style="margin-top: 5px;" ng-click="send()" type="button">{{commentbox.button_txt}}</button>
-            </div>
-            <br>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="display: none">
-                <li ng-repeat="atItem in atList | filter:commentbox.comment_txt" role="presentation">
-                    <a role="menuitem" tabindex="-1" href="" ng-click="addItem2Editor(atItem)">{{atItem.name}}</a>
-                </li>
-            </ul>
-        </div>
-
-        <div id="uploadimg_div" style="float: left;padding: 15px;display: none">
-            <button type="button" style="position: absolute;top: 5px;margin-left: 205px;"
-                    class="close" ng-click="hideImgPop()">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-            <div id="imglist" style="width: 200px;">
-                <img style="width: 200px;height: 200px">
-            </div>
-        </div>
-
-        <div class="row" id="emotions_div" style="width: 410px;padding: 10px;display: none">
-            <button type="button" style="position: absolute;top: 5px;margin-left: 375px;"
-                    class="close" ng-click="hideEmoPop()">
-                <span class="glyphicon glyphicon-remove"></span>
-            </button>
-            <ul class="list-unstyled list-inline" style="display: block;float: left;width: 100%">
-                <li style="padding: 2px;min-width: 20px;float: left" >
-                    <button type="button" class="btn btn-link btn-sm" ng-init="currentPage=0" ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1" >
-                        <i><span class="glyphicon glyphicon-chevron-left"></span></i>
-                    </button>
-                </li>
-                <li style="padding: 2px;min-width: 20px;float: left" ng-repeat="category in emotions_category|startFrom:currentPage*pageSize | limitTo:pageSize">
-                    <a href="" style="position: relative;display: inline-block;" ng-click="categoryChange(category)">
-                        [{{category}}]
-                    </a>
-                </li>
-                <li style="padding: 2px;min-width: 20px;float: right" >
-                    <button type="button" class="btn btn-link btn-sm" ng-disabled="currentPage >= emotions_category.length/pageSize - 1"  ng-click="currentPage=currentPage+1">
-                        <i><span class="glyphicon glyphicon-chevron-right"></span></i>
-                    </button>
-                </li>
-            </ul>
-            <ul class="list-unstyled list-inline" style="display: block;float: left">
-                <li style="padding: 2px;min-width: 20px;" ng-repeat="emotion in emotions|filter:current_category">
-                    <a href="" style="position: relative;display: inline-block;" ng-click="insertEmotion(emotion.phrase)">
-                        <img ng-src="{{emotion.url}}">
-                    </a>
-                </li>
-            </ul>
         </div>
     </div>
+
+    <div id="comment_text_div" class="panel panel-default shadow"
+         style="display:none; position: absolute;z-index: 9999;width:80%;top:0px;margin-left: 75px;margin-top:120px;">
+        <div class="panel-heading">{{commentbox.title}}<span class="panel-title" style="float:right">{{commentbox.lastCharNum}}</span>
+        </div>
+        <textarea class="form-control" id="comment_textarea" ng-model="commentbox.comment_txt"
+                  style="height:100px;border-radius:0 0 0 0;">
+        </textarea>
+
+        <div style="float: left;margin-top: 15px;margin-left: 5px">
+            <a href="" id="selectImgBtn" class="" style="font-size: 14px"
+               ng-show="commentbox.type=='create'" ng-click="selectImg()">
+                <i><span class="glyphicon glyphicon-picture"></span></i>
+            </a>
+            <a href="" id="showEmotionsBtn" class="" ng-click="showEmotions()"><i class="iconfont">&#x3564</i></a>
+            <input type="checkbox" ng-model="chk_also_repost" style="display: none">
+            <a href="" class="" ng-show="commentbox.type=='comment'" ng-click="chk_also_repost=!chk_also_repost">
+                <i><span
+                        ng-class="{'glyphicon':true,'glyphicon-check':chk_also_repost,'glyphicon-unchecked':!chk_also_repost}"></span></i>同时转发
+            </a>
+            <input type="checkbox" ng-model="chk_also_comment" style="display: none">
+            <a href="" ng-show="commentbox.type=='repost'" ng-click="chk_also_comment=!chk_also_comment">
+                <i><span
+                        ng-class="{'glyphicon':true,'glyphicon-check':chk_also_comment,'glyphicon-unchecked':!chk_also_comment}"></span></i>同时评论
+            </a>
+            <input type="checkbox" ng-model="chk_also_comment_orig" style="display: none">
+            <a href="" ng-show="commentbox.type=='repost'&&commentbox.repost_with_retweet"
+               ng-click="chk_also_comment_orig=!chk_also_comment_orig">
+                <i><span
+                        ng-class="{'glyphicon':true,'glyphicon-check':chk_also_comment_orig,'glyphicon-unchecked':!chk_also_comment_orig}"></span></i>同时评论原文
+            </a>
+            <input type="file" id="files" name="files[]" multiple style="display: none"/>
+        </div>
+
+        <div style="float: right;margin-top: 5px;margin-right: 5px;margin-bottom: 5px">
+            <button class="btn btn-default" style="margin-top: 5px;" ng-click="hideCommentText()" type="button">取消
+            </button>
+            <button class="btn btn-primary" style="margin-top: 5px;" ng-click="send()" type="button">
+                {{commentbox.button_txt}}
+            </button>
+        </div>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" style="display: none">
+            <li ng-repeat="atItem in atList | filter:commentbox.comment_txt" role="presentation">
+                <a role="menuitem" tabindex="-1" href="" ng-click="addItem2Editor(atItem)">{{atItem.name}}</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="uploadimg_div" style="float: left;padding: 15px;display: none">
+        <button type="button" style="position: absolute;top: 5px;margin-left: 205px;"
+                class="close" ng-click="hideImgPop()">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+        <div id="imglist" style="width: 200px;">
+            <img style="width: 200px;height: 200px">
+        </div>
+    </div>
+
+    <div class="row" id="emotions_div" style="width: 410px;padding: 5px;display: none">
+        <button type="button" style="position: absolute;top: 3px;margin-left: 380px;"
+                class="close" ng-click="hideEmoPop()">
+            <span class="glyphicon glyphicon-remove"></span>
+        </button>
+        <ul class="list-unstyled list-inline" style="display: block;float: left;width: 100%;margin: auto;">
+            <li style="padding: 2px;min-width: 20px;float: left">
+                <button type="button" class="btn btn-link btn-sm" ng-init="currentPage=0" ng-disabled="currentPage == 0"
+                        ng-click="currentPage=currentPage-1">
+                    <i><span class="glyphicon glyphicon-chevron-left"></span></i>
+                </button>
+            </li>
+            <li style="padding: 2px;min-width: 20px;float: left;margin-top: 4px;"
+                ng-repeat="category in emotions_category|startFrom:currentPage*pageSize | limitTo:pageSize">
+                <a href="" style="position: relative;display: inline-block;" ng-click="categoryChange(category)">
+                    [{{category}}]
+                </a>
+            </li>
+            <li style="padding: 2px;min-width: 20px;float: right;">
+                <button type="button" class="btn btn-link btn-sm"
+                        ng-disabled="currentPage >= emotions_category.length/pageSize - 1"
+                        ng-click="currentPage=currentPage+1">
+                    <i><span class="glyphicon glyphicon-chevron-right"></span></i>
+                </button>
+            </li>
+        </ul>
+        <ul class="list-unstyled list-inline" style="display: block;float: left;margin: auto;padding-left: 5px;">
+            <li style="padding: 2px;min-width: 20px;" ng-repeat="emotion in emotions|filter:current_category">
+                <a href="" style="position: relative;display: inline-block;" ng-click="insertEmotion(emotion.phrase)">
+                    <img ng-src="{{emotion.url}}">
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
 
 </div>
 
 </body>
 
 <script src="lib/angular/angular.min.js"></script>
-<script src="lib/jquery/jquery.min.js"></script>
+<script src="lib/jquery/jquery-2.1.1.min.js"></script>
 <script src="lib/exif/exif.js"></script>
 <script src="lib/exif/binaryajax.js"></script>
 <script src="lib/bootstrap/bootstrap.js"></script>

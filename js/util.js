@@ -1,4 +1,5 @@
 function buildBlob(parts) {
+    debugger;
     var blob = null;
     var version = parseInt(getChromeVersion() || 0, 10);
     if (version >= 20) {
