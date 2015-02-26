@@ -390,12 +390,14 @@ angular.module('myApp.controllers', [])
         };
 
         $scope.favorite= function(item){
-            sinaApi.favorite(item.id,item.favorited,function(){
+            sinaApi.favorite(item.id,item.favorited,function(data){
                 item.favorited = data.status.favorited;
-                if(item.favorited)
-                    Example.show("收藏成功")
-                else
-                    Example.show("移除收藏成功")
+                if(item.favorited){
+                    Example.show("收藏成功");
+                }
+                else{
+                    Example.show("移除收藏成功");
+                }
             },function(){
                 Example.show("操作失败");
             });
@@ -593,16 +595,11 @@ angular.module('myApp.controllers', [])
         }
 
         $scope.get_timeline_next = function(){
-            if(localStorage.current_tab == $scope.tabs.home)
-                $scope.get_home_timeline();
-            if(localStorage.current_tab == $scope.tabs.comments)
-                $scope.get_comments_timeline();
-            if(localStorage.current_tab == $scope.tabs.at)
-                $scope.get_mentions_timeline();
-            if(localStorage.current_tab == $scope.tabs.favorites)
-                $scope.get_favorites();
-            if(localStorage.current_tab == $scope.tabs.user)
-                $scope.get_user_timeline();
+            if(localStorage.current_tab == $scope.tabs.home)$scope.get_home_timeline();
+            if(localStorage.current_tab == $scope.tabs.comments)$scope.get_comments_timeline();
+            if(localStorage.current_tab == $scope.tabs.at)$scope.get_mentions_timeline();
+            if (localStorage.current_tab == $scope.tabs.favorites) $scope.get_favorites();
+            if(localStorage.current_tab == $scope.tabs.user) $scope.get_user_timeline();
         };
 
         $scope.gotoOption = function(){

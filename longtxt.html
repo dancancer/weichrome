@@ -7,26 +7,27 @@
     <link rel="stylesheet" href="css/bootstrap/bootstrap.css"/>
     <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css">
     <link rel="stylesheet" href="css/myweibo.css"/>
-    <!--<link href="css/prettify.css" rel="stylesheet">-->
-    <!--<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">-->
-    <!--<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" rel="stylesheet">-->
-    <!--<link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">-->
     <style>
         #editor {
-            /*max-height: 250px;*/
             min-height: 250px;
             background-color: white;
             border-collapse: separate;
             border: 1px solid rgb(204, 204, 204);
-            padding: 4px;
             box-sizing: content-box;
             -webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
             box-shadow: rgba(0, 0, 0, 0.0745098) 0px 1px 1px 0px inset;
-            border-top-right-radius: 3px; border-bottom-right-radius: 3px;
-            border-bottom-left-radius: 3px; border-top-left-radius: 3px;
-            overflow: scroll;
+            border-radius: 3px;
             outline: none;
+            overflow: hidden;
+            position: relative;
+            padding: 15px;
+            font-size: medium;
         }
+
+        #editor img{
+            max-width: 100%;
+        }
+
         #voiceBtn {
             width: 20px;
             color: transparent;
@@ -40,44 +41,29 @@
             -webkit-box-shadow: none;
         }
 
-        div[data-role="editor-toolbar"] {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+        #emotions_div{
+            width: 410px;
+            padding: 10px;
+            display: none;
+            z-index: 9999;
         }
 
-        .dropdown-menu a {
-            cursor: pointer;
-        }
-        .popover{
-            max-width: 720px;
-        }
-        .clear { clear: both;
-            max-height: 90000px;
-        }
-        .scrollable-menu {
-            height: auto;
-            max-height: 200px;
-            overflow-x: hidden;
-        }
-        #editor img{
-            max-width: 100%;
+        #emotions_div a{
+            position: relative;
+            display: inline-block;
         }
 
-        .no-text-shadow{
-            text-shadow: none;
-        }
-
-        .zhuangbility-text-shadow{
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.125);
+        #clost_em{
+            position: absolute;
+            top: 3px;
+            margin-left: 393px;
         }
     </style>
 </head>
-<body style="text-shadow: 0 1px 0 #FFFFFF;background: #f5f5f5;padding: 3px;margin:auto;width: 960px;overflow-y: visible;">
+<body class="long-txt">
 
 
-<div ng-controller="longtxtCtrl" style="width: 720px;margin: auto;">
+<div ng-controller="longtxtCtrl" class="controller">
     <h1>WeiKr 长微博工具</h1>
     <div id="comment_text_div" class="panel panel-default shadow"
          style="display:block; position: relative;z-index: 9999;width:100%;top:0px;">
@@ -85,21 +71,20 @@
         </div>
 
         <div class="panel-body">
-            <textarea class="form-control" id="comment_textarea" ng-model="commentbox.comment_txt" placeholder="写点啥..."
-                      style="height:100px;border-radius:0 0 0 0;">
+            <textarea class="form-control" id="comment_textarea" ng-model="commentbox.comment_txt" placeholder="写点啥...">
             </textarea>
         </div>
-        <div class="panel-footer" style="height: 50px">
-            <div style="float: left;margin-top: 5px;margin-left: 5px">
+        <div class="panel-footer">
+            <div class="left-btn-group">
                 <a href="" id="showEmotionsBtn"><i class="fa fa-smile-o" style="font-size: 28px"></i></a>
                 <input type="file" id="files" name="files[]" multiple style="display: none"/>
             </div>
 
-            <div style="float: right;margin-top: -5px;margin-right: 5px;margin-bottom: 5px">
-                <button id="save_pic" ng-click="save_img()" class="btn btn-default" style="margin-top: 5px;" type="button">
+            <div class="right-btn-group">
+                <button id="save_pic" ng-click="save_img()" class="btn btn-default" type="button">
                     {{save_btn_txt}}
                 </button>
-                <button class="btn btn-primary" style="margin-top: 5px;" ng-click="update()" type="button">
+                <button class="btn btn-primary"  ng-click="update()" type="button">
                     {{commentbox.button_txt}}
                 </button>
             </div>
@@ -160,31 +145,30 @@
             </form>
         </div>
 
-        <div id="editor" class="clear no-text-shadow" style="overflow: hidden;position: relative;padding: 15px;font-size: medium;" >
+        <div id="editor" class="clear no-text-shadow" >
         </div>
     </div>
     <div id="canvas-div">
     </div>
 
-    <div id="emotions_div" style="width: 410px;padding: 10px;display: none;z-index: 9999;">
-        <button type="button" id="clost_em" style="position: absolute;top: 3px;margin-left: 393px;"
-                class="close">
+    <div id="emotions_div" >
+        <button type="button" id="clost_em" class="close">
             <i class="fa fa-times"></i>
         </button>
-        <ul class="list-unstyled list-inline" style="display: block;float: left;width: 100%;margin: auto;">
-            <li style="padding: 2px;min-width: 20px;float: left">
+        <ul class="list-unstyled list-inline emotions-nav">
+            <li style="float: left">
                 <button type="button" class="btn btn-link" ng-init="current_page=0" ng-disabled="current_page == 0"
                         ng-click="current_page=current_page-1">
                     <i class="fa fa-chevron-left"></i>
                 </button>
             </li>
-            <li style="padding: 2px;min-width: 20px;float: left;margin-top: 4px;"
+            <li style="float: left;margin-top: 4px;"
                 ng-repeat="category in emotions_category|startFrom:current_page*page_size | limitTo:page_size">
-                <a href="" style="position: relative;display: inline-block;" ng-click="category_change(category)">
+                <a href=""  ng-click="category_change(category)">
                     [{{category}}]
                 </a>
             </li>
-            <li style="padding: 2px;min-width: 20px;float: right;">
+            <li style="float: right;">
                 <button type="button" class="btn btn-link "
                         ng-disabled="current_page >= emotions_category.length/page_size - 1"
                         ng-click="current_page=current_page+1">
@@ -192,9 +176,9 @@
                 </button>
             </li>
         </ul>
-        <ul class="list-unstyled list-inline" style="display: block;float: left;margin: auto;padding-bottom: 15px">
-            <li style="padding: 2px;min-width: 20px;" ng-repeat="emotion in emotions|filter:current_category">
-                <a href="" style="position: relative;display: inline-block;" ng-click="insert_emotion(emotion.phrase)">
+        <ul class="list-unstyled list-inline emotions-list" >
+            <li ng-repeat="emotion in emotions|filter:current_category">
+                <a href=""  ng-click="insert_emotion(emotion.phrase)">
                     <img ng-src="{{emotion.url}}">
                 </a>
             </li>
@@ -206,7 +190,6 @@
 <script src="lib/exif/exif.js"></script>
 <script src="lib/exif/binaryajax.js"></script>
 <script src="lib/bootstrap/bootstrap.js"></script>
-<!--<script src="lib/google-code-prettify/prettify.js"></script>-->
 <script src="lib/jquery/hotkey.js"></script>
 <script src="lib/wysiwyg/bootstrap-wysiwyg.js"></script>
 <script src="lib/html2canvas.js"></script>

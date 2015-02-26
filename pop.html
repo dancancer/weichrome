@@ -17,37 +17,79 @@
         .head {
             height: 50px;
         }
+        body{
+            overflow:hidden;
+            height: 590px;
+            text-shadow: 0 1px 0 #FFFFFF;
+            background: rgba(242,242,242,1);
+            font-family: '微软雅黑'
+        }
+        #tab-content{
+            float: left;
+            padding-right:0px;
+            position: relative;
+            z-index: 0;
+            overflow: hidden
+        }
+
+        #warp{
+            margin-top: 55px;
+            height:535px;
+            overflow-y:auto;
+            overflow-x: hidden;
+        }
+        .main{
+            width: 600px;padding-left: 10px;position: relative;overflow: hidden
+        }
+
+        .user-info{
+            height: 150px;
+            width:580px;
+            display: none;
+        }
+
+        .user-avatar{
+            text-align: center;
+            height: 120px;
+            width: 120px;
+            float:left;
+            margin-right: 10px;
+        }
+
+        .user-detail{
+            position: relative;
+            padding-top: 10px;
+        }
+
+        .user-info .follow-status{
+            float: right;
+            position: absolute;
+            top: 10px;
+            left: 480px;
+        }
+
+        .timeline-row{
+            margin-top: 10px;
+            width: 585px;
+        }
     </style>
 </head>
-<body style="overflow:hidden;height: 590px;
-    text-shadow: 0 1px 0 #FFFFFF;background: rgba(242,242,242,1);font-family: '微软雅黑'">
+<body >
 <div id="a1" ng-controller="weiboCtrl" style="z-index: 1;overflow: hidden;height:100%;">
 <div class="tab-content" ng-show="isAuth==false">
     <h2>请先到<a href="" ng-click="gotoOption()">设置</a>界面进行用户授权。</h2>
-
-    <div style="text-align: center">
-        <iframe id="oAuthIframe" src="" style="width: 600px;height: 600px;border: none" ></iframe>
-    </div>
-
 </div>
 <div id="tab-content" class="tab-content" ng-show="isAuth==true"
-     style="float: left;padding-right:0px;position: relative;z-index: 0;overflow: hidden">
-    <div style="width: 600px;padding-left: 10px;position: relative;overflow: hidden">
+     style="">
+    <div class="main">
         <header></header>
-        <div id="infodiv" class="popover right fade in" ng-click="hideinfo()" style="position: absolute">
-            <div class="arrow"></div>
-            <h3 class="popover-title" style="display: none;"></h3>
-
-            <div class="popover-content"></div>
-        </div>
-        <div id="warp" ng-if="showMain" style="margin-top: 55px;height:535px;overflow-y:auto;overflow-x: hidden;">
-            <div ng-if="current_tab==tabs.user" class="panel panel-default"
-                 style="height: 150px;width:580px;display: none">
+        <div id="warp" ng-if="showMain" >
+            <div ng-if="current_tab==tabs.user" class="panel panel-default userinfo">
                 <div class="panel-body">
-                    <div style="text-align: center;height: 120px;width: 120px;float:left;margin-right: 10px;">
+                    <div class="user-avatar" style="">
                         <img class="img-thumbnail" ng-src="{{target_user.avatar_large}}">
                     </div>
-                    <div style="position: relative;padding-top: 10px;">
+                    <div class="user-detail" >
                         <b ng-bind="target_user.name"></b>
                         <ul class="list-inline list-unstyled">
                             <li>粉丝</li>
@@ -59,7 +101,7 @@
                         </ul>
                         <span ng-bind="target_user.description"></span>
 
-                        <div style="float: right;position: absolute;top: 10px;left: 480px;">
+                        <div class="follow-status">
                             <a ng-if="target_user.following">已关注</a>
                             <a ng-if="!target_user.following">+关注</a>
                         </div>
@@ -68,8 +110,7 @@
                 </div>
             </div>
             <div id="repeatContent" on-finish-render bindonce ng-repeat="item in timeline track by item.id"
-                 class="bottom_line"
-                 style="margin-top: 10px;width: 585px;">
+                 class="bottom_line timeline-row">
                 <div name="mainContant" class="row" style=" margin-left: 0px;margin-right: 0px">
                     <div name="avatar" style="width: 60px;float: left">
                         <a bo-href="'http://www.weibo.com/'+item.user.profile_url"

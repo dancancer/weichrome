@@ -1,12 +1,12 @@
 {
   "name": "WeiKr",
-  "version": "0.3.2",
+  "version": "0.3.4",
     "description": "手边微博",
   "background": {
       "page": "background.html"
   },
   "options_page": "option.html",
-  "content_security_policy": "script-src 'self' 'unsafe-eval';object-src 'self'",
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google-analytics.com;object-src 'self'",
   "permissions": [ "fontSettings","notifications", "contextMenus", "tabs", "webRequest","http://*/*", "https://*/*" ],
   "browser_action": {
       "default_icon": "icon_48.png",

@@ -1,9 +1,12 @@
-<div ng-show="current_timeline_api!=api.comments_timeline" name="actionbar" style="clear:right;float: right;margin-right: 5px;margin-bottom: 3px;">
-    <a href="" ng-class="{'action-re':!item.retweeted_status.favorited,'action-h':item.retweeted_status.favorited}" ng-click="favorite(item.retweeted_status)"><i><span class="glyphicon glyphicon-heart"></span></i></a>
+<div ng-show="current_timeline_api!=api.comments_timeline" name="actionbar" class="action-bar-rt">
+    <a href="" ng-class="{'action-re':!item.retweeted_status.favorited,'action-h':item.retweeted_status.favorited}"
+       ng-click="favorite(item.retweeted_status)"><i><span class="glyphicon glyphicon-heart"></span></i></a>
     <a href="" class="action-re"><i><span class="glyphicon glyphicon-thumbs-up"></span></i></a>
     <a href="" class="action-re">({{item.retweeted_status.attitudes_count}})</a>
-    <a href="" class="action-re" ng-click="showCommentText(item.retweeted_status,'repost',$event)"><i><span class="glyphicon glyphicon-share-alt"></span></i></a>
+    <a href="" class="action-re" ng-click="showCommentText(item.retweeted_status,'repost',$event)"><i><span
+            class="glyphicon glyphicon-share-alt"></span></i></a>
     <a href="" class="action-re" ng-click="showReRepost(item.retweeted_status,$index)">({{item.retweeted_status.reposts_count}})</a>
-    <a href="" class="action-re" ng-click="showCommentText(item.retweeted_status,'comment',$event)"><i><span class="glyphicon glyphicon-comment"></span></i></a>
+    <a href="" class="action-re" ng-click="showCommentText(item.retweeted_status,'comment',$event)"><i><span
+            class="glyphicon glyphicon-comment"></span></i></a>
     <a href="" class="action-re" ng-click="showReComments(item.retweeted_status,$index)">({{item.retweeted_status.comments_count}})</a>
 </div>
